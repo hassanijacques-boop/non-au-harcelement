@@ -3,7 +3,8 @@
 from fpdf import FPDF
 import os
 
-ECO = os.environ.get("ECO") == "1"     # version économe : pas d’aplats noirs
+ECO = os.environ.get("ECO") == "1"          # version économe : pas d’aplats noirs
+COULEUR = os.environ.get("COULEUR") == "1"  # version institutionnelle couleur
 FONT = "/home/hermeswebui/.fonts/DejaVuSans.ttf"
 FONTB = "/home/hermeswebui/.fonts/DejaVuSans-Bold.ttf"
 
@@ -12,6 +13,25 @@ GREY = (95, 100, 110)
 LGREY = (232, 234, 238)
 MGREY = (176, 181, 190)
 LINE = (200, 205, 214)
+
+# palette institutionnelle
+IND = (58, 48, 176)        # indigo : couleur principale
+IND_C = (232, 233, 250)    # indigo très clair
+BLEU = (16, 106, 200)      # CE2
+BLEU_C = (229, 241, 252)
+TEAL = (12, 122, 130)      # CM2
+TEAL_C = (226, 244, 245)
+VERT = (22, 132, 76)       # conflit / accord
+VERT_C = (231, 247, 238)
+AMBRE = (176, 106, 8)      # moquerie
+AMBRE_C = (253, 246, 228)
+ROUGE = (192, 38, 44)      # harcèlement
+ROUGE_C = (253, 233, 233)
+PRUNE = (146, 42, 96)      # violence
+PRUNE_C = (250, 234, 242)
+VIO = (108, 78, 180)       # CM1
+VIO_C = (240, 236, 250)
+
 LM = 12
 W = 186          # largeur utile (210 - 24)
 
@@ -48,7 +68,7 @@ def entete(pdf, surtitre, titre, sous=""):
         pdf.set_line_width(0.9)
         pdf.line(LM, 19, 210 - LM, 19)
     else:
-        pdf.set_fill_color(*INK)
+        pdf.set_fill_color(*(IND if COULEUR else INK))
         pdf.rect(0, 0, 210, 21, style="F")
         pdf.set_xy(LM, 4)
         pdf.set_font("D", "", 7.4)
@@ -136,7 +156,7 @@ def carte(pdf, x, y, w, h, num, texte, taille=8.6, gras=False):
         pdf.set_font("D", "B", 8.2)
         pdf.set_text_color(*INK)
     else:
-        pdf.set_fill_color(*INK)
+        pdf.set_fill_color(*(IND if COULEUR else INK))
         pdf.ellipse(x + 3.5, y + 3.5, 7, 7, style="F")
         pdf.set_font("D", "B", 8.2)
         pdf.set_text_color(255, 255, 255)
@@ -241,7 +261,192 @@ QUIZ = [
     ("Si tu vois un élève harcelé, que peux-tu faire en premier ?", "Ne pas rire, ne pas filmer, aller le voir, et prévenir un adulte."),
 ]
 
+# ==================== COUVERTURE (version couleur) ====================
+def couverture(pdf):
+    pdf.add_page()
+    pdf.set_fill_color(*IND)
+    pdf.rect(0, 0, 210, 96, style="F")
+    pdf.set_xy(LM, 14)
+    pdf.set_font("D", "", 8.4)
+    pdf.set_text_color(205, 208, 245)
+    pdf.cell(0, 4.6, "ÉCOLE PRIMAIRE PUBLIQUE LA ROSE  ·  CIRCONSCRIPTION IEN BANDRAOUA")
+    pdf.set_xy(LM, 24)
+    pdf.set_font("D", "B", 30)
+    pdf.set_text_color(255, 255, 255)
+    pdf.cell(0, 12, "Journée du 5 novembre 2026")
+    pdf.set_xy(LM, 39)
+    pdf.set_font("D", "B", 15)
+    pdf.set_text_color(226, 228, 250)
+    pdf.cell(0, 8, "Kit pédagogique de lutte contre le harcèlement")
+    pdf.set_xy(LM, 49)
+    pdf.set_font("D", "", 10.4)
+    pdf.cell(0, 6, "Du CE2 au CM2  ·  sept classes  ·  dix-sept pages  ·  trois niveaux")
+    pdf.set_fill_color(255, 255, 255)
+    pdf.rect(LM, 61, 44, 0.9, style="F")
+    pdf.set_xy(LM, 66)
+    pdf.set_font("D", "", 8.8)
+    pdf.set_text_color(215, 218, 250)
+    pdf.multi_cell(150, 5, "Document de présentation au CPC et à l’inspecteur de circonscription. "
+                           "Contenu pédagogique complet, supports élèves et fiches animateur.", align="L")
+
+    # sommaire coloré
+    pdf.set_y(106)
+    pdf.set_font("D", "B", 12)
+    pdf.set_text_color(*IND)
+    pdf.set_x(LM)
+    pdf.cell(0, 6, "Ce que contient le kit")
+    y = 116
+    blocs = [
+        (BLEU, BLEU_C, "CE2", "comprendre ce que c’est", "pages 2 à 5  ·  45 minutes",
+         ["Les 4 visages : trier 16 situations en 4 familles",
+          "La feuille froissée : la trace des mots",
+          "L’affiche de la classe"]),
+        (VIO, VIO_C, "CM1", "mesurer et agir", "pages 6 à 8  ·  45 minutes",
+         ["Le thermomètre : les trois signes du harcèlement",
+          "Le plan du témoin : dire, à qui, et ne pas faire",
+          "Le mur des mots qui réparent"]),
+        (TEAL, TEAL_C, "CM2  et  CM1/CM2", "argumenter et s’entraîner", "pages 9 à 12  ·  50 minutes",
+         ["Débat mouvant : huit affirmations à départager",
+          "Théâtre-forum : trois saynètes, un joker",
+          "Désignation des élèves ambassadeurs"]),
+    ]
+    for col, colc, niv, obj, pages_txt, items in blocs:
+        pdf.set_fill_color(*colc)
+        pdf.set_draw_color(*col)
+        pdf.set_line_width(0.8)
+        pdf.rect(LM, y, W, 36, style="DF")
+        pdf.set_fill_color(*col)
+        pdf.rect(LM, y, 3.4, 36, style="F")
+        pdf.set_xy(LM + 7, y + 2.6)
+        pdf.set_font("D", "B", 11)
+        pdf.set_text_color(*col)
+        pdf.cell(W - 12, 5.4, niv)
+        pdf.set_xy(LM + 7, y + 8.6)
+        pdf.set_font("D", "", 8.4)
+        pdf.set_text_color(*INK)
+        pdf.cell(W - 12, 4.6, obj + "   ·   " + pages_txt)
+        yy = y + 15
+        for it in items:
+            pdf.set_xy(LM + 8, yy)
+            pdf.set_font("D", "", 8.2)
+            pdf.multi_cell(W - 14, 4.3, "•  " + it, align="L")
+            yy = pdf.get_y() + 0.8
+        y += 39
+
+    # principes
+    pdf.set_y(y + 2)
+    pdf.set_fill_color(*IND_C)
+    pdf.rect(LM, y + 2, W, 30, style="F")
+    pdf.set_xy(LM + 4, y + 5)
+    pdf.set_font("D", "B", 9.2)
+    pdf.set_text_color(*IND)
+    pdf.cell(0, 4.6, "Les trois principes")
+    pdf.set_xy(LM + 4, y + 11)
+    pdf.set_font("D", "", 8.2)
+    pdf.set_text_color(*INK)
+    pdf.multi_cell(W - 8, 4.5,
+        "Les activités servent le questionnaire : le guide demande d’expliquer le harcèlement avant de "
+        "faire remplir la grille.  ·  Toute l’école fait la même chose au même moment, et laisse une trace "
+        "commune.  ·  La personne ressource outille ses collègues, elle ne se substitue pas à eux.", align="L")
+
+    pdf.set_y(268)
+    pdf.set_font("D", "", 8)
+    pdf.set_text_color(*GREY)
+    pdf.set_x(LM)
+    pdf.multi_cell(W, 4.4, "Version couleur institutionnelle · édition du 27 octobre 2026 · le kit est "
+                           "aussi disponible en version économe pour la reprographie de l’école.", align="L")
+    pdf.pied("Kit Journée du 5 novembre · version institutionnelle")
+
+
+# ==================== NOTE DE PRESENTATION CPC / IEN ====================
+def note_cpc(pdf):
+    pdf.add_page()
+    entete(pdf, "Note de présentation", "Ce que ce kit apporte, et à quoi il répond",
+           "Document destiné au conseiller pédagogique et à l’inspecteur de circonscription. "
+           "Les pages suivantes sont le contenu pédagogique, utilisable tel quel par les professeurs.")
+
+    h2(pdf, "Ce dont il s’agit", 40)
+    para(pdf, "Un kit d’activités pour la journée nationale de lutte contre le harcèlement, conçu pour "
+              "sept classes d’école élémentaire (deux CE2, trois CM1, un CM2, un CM1-CM2). Il ne remplace "
+              "pas la passation de la grille officielle : il la prépare. Le guide de passation demande en "
+              "effet d’expliquer aux élèves ce que sont le harcèlement et ses conséquences avant de leur "
+              "remettre le questionnaire. Ces activités sont cette explication — organisée, écrite, et "
+              "conçue pour être menée par chaque professeur dans sa classe, sans formation préalable.")
+    pdf.set_y(pdf.get_y() + 1.5)
+
+    h2(pdf, "Ce que chaque activité produit comme trace")
+    pdf.set_draw_color(*LINE)
+    pdf.set_font("D", "B", 7.6)
+    pdf.set_fill_color(*IND_C)
+    pdf.set_text_color(*INK)
+    pdf.cell(22, 6.6, "Niveau", border=1, fill=True)
+    pdf.cell(52, 6.6, "Activité", border=1, fill=True)
+    pdf.cell(16, 6.6, "Durée", border=1, fill=True)
+    pdf.cell(0, 6.6, "Trace produite, réutilisable dans le dossier", border=1, fill=True)
+    pdf.set_y(pdf.get_y() + 6.6)
+    traces = [
+        ("CE2", "Les 4 visages", "25 min", "Tableau de la classe en quatre colonnes, affiché et daté"),
+        ("CE2", "La feuille froissée", "10 min", "Phrase de référence écrite au tableau, recopiée au cahier"),
+        ("CE2", "L’affiche de la classe", "25 min", "Une affiche par classe, exposée dans le couloir"),
+        ("CM1", "Le thermomètre", "20 min", "Fiche élève : huit situations passées aux trois critères"),
+        ("CM1", "Le plan du témoin", "25 min", "Fiche élève conservée : dire, à qui, ne pas faire"),
+        ("CM1", "Le mur des mots", "15 min", "Cinq mots par classe sur le rouleau collectif"),
+        ("CM2", "Débat mouvant", "25 min", "Trois engagements de la classe, écrits et affichés"),
+        ("CM2", "Théâtre-forum", "30 min", "Grille d’observation et solutions retenues"),
+        ("Tous", "Questionnaire officiel", "30 min", "Les grilles papier, pièce de référence de l’enquête"),
+    ]
+    for niv, act, dur, tr in traces:
+        yy = pdf.get_y()
+        pdf.set_font("D", "B", 7.6)
+        pdf.set_x(LM)
+        pdf.cell(22, 7.4, niv, border=1)
+        pdf.set_font("D", "", 7.6)
+        pdf.cell(52, 7.4, act, border=1)
+        pdf.cell(16, 7.4, dur, border=1, align="C")
+        pdf.set_font("D", "", 7.4)
+        pdf.set_xy(LM + 90, yy + 1.6)
+        pdf.multi_cell(W - 90, 4.1, tr, align="L")
+        pdf.set_y(yy + 7.4)
+
+    h2(pdf, "La contribution aux quatre axes de la labellisation")
+    for col, axe, txt in [
+        (IND, "Axe 1 — S’engager", "Une action commune à toutes les classes, à une date unique, tracée par "
+         "des productions datées : un diagnostic partagé, pas une intention."),
+        (VERT, "Axe 2 — Prévenir", "Des séances ciblées par niveau, avant le questionnaire, dont l’effet "
+         "est mesurable : les thèmes ressortis dans l’enquête dicteront la suite de l’année."),
+        (AMBRE, "Axe 3 — Former", "Un kit clé en main, réutilisable d’une année sur l’autre, qui ne demande "
+         "ni formation ni matériel : c’est ce qui rend l’action soutenable dans la durée."),
+        (ROUGE, "Axe 4 — Prendre en charge", "La fiche adulte (page 17) fixe la conduite à tenir si un "
+         "élève se confie, et rappelle les destinataires et le protocole national."),
+    ]:
+        yy = pdf.get_y()
+        pdf.set_fill_color(*col)
+        pdf.rect(LM, yy + 0.6, 1.8, 9.4, style="F")
+        pdf.set_font("D", "B", 8.4)
+        pdf.set_text_color(*col)
+        pdf.set_xy(LM + 4, yy)
+        pdf.cell(50, 4.8, axe)
+        pdf.set_font("D", "", 8)
+        pdf.set_text_color(*INK)
+        pdf.set_xy(LM + 55, yy + 0.4)
+        pdf.multi_cell(W - 55, 4.4, txt, align="L")
+        pdf.set_y(max(pdf.get_y(), yy + 11) + 1.4)
+
+    enc = bloc(pdf, "Ce que ce kit ne fait pas", [
+        "Il ne modifie pas le protocole : la grille est remplie sur papier, pendant les deux heures "
+        "banalisées, sous la responsabilité du professeur de la classe.",
+        "Il ne fait témoigner aucun élève sur sa propre situation, et ne met en scène aucune situation "
+        "réelle : les saynètes sont inventées.",
+        "Il ne se substitue pas à l’équipe ressource : les situations individuelles suivent le circuit "
+        "habituel (direction, équipe Phare, protocole national)."],
+        pdf.get_y() + 3, fill=(248, 249, 252))
+    pdf.pied("Kit Journée du 5 novembre · note de présentation")
+
 pdf = PDF()
+
+if COULEUR:
+    couverture(pdf)
+    note_cpc(pdf)
 
 # ==================== 1. MODE D'EMPLOI DU KIT ====================
 pdf.add_page()
@@ -262,7 +467,7 @@ if ECO:
     pdf.line(LM, 31, 210 - LM, 31)
     pdf.set_y(38)
 else:
-    pdf.set_fill_color(*INK)
+    pdf.set_fill_color(*(IND if COULEUR else INK))
     pdf.rect(0, 0, 210, 34, style="F")
     pdf.set_xy(LM, 8)
     pdf.set_font("D", "B", 19)
@@ -416,22 +621,31 @@ ent = [("1", "CONFLIT", "Deux personnes de force égale. Ça s’arrête, ça se
        ("3", "HARCÈLEMENT", "Ça se répète. C’est fait exprès. L’un est plus fort que l’autre."),
        ("4", "VIOLENCE", "On touche au corps ou à l’intimité. Même une fois, c’est grave.")]
 w = (W - 6) / 2
+COUL4 = [(VERT, VERT_C), (AMBRE, AMBRE_C), (ROUGE, ROUGE_C), (PRUNE, PRUNE_C)]
 for i, (num, titre, defi) in enumerate(ent):
     x = LM + (i % 2) * (w + 6)
     y = 44 + (i // 2) * 78
-    pdf.set_draw_color(*INK)
+    col, colc = COUL4[i] if COULEUR else (INK, None)
+    if colc:
+        pdf.set_fill_color(*colc)
+        pdf.rect(x, y, w, 72, style="F")
+    pdf.set_draw_color(*col)
     pdf.set_line_width(1.1)
     pdf.rect(x, y, w, 72)
     pdf.set_font("D", "B", 30)
-    pdf.set_text_color(*LINE)
+    pdf.set_text_color(*(LINE if not COULEUR else colc))
+    if COULEUR:
+        pdf.set_text_color(*col)
+        pdf.set_font("D", "B", 13)
     pdf.set_xy(x + 4, y + 3)
     pdf.cell(0, 12, num)
     pdf.set_xy(x + 4, y + 20)
     pdf.set_font("D", "B", 16)
-    pdf.set_text_color(*INK)
+    pdf.set_text_color(*col if COULEUR else INK)
     pdf.cell(0, 8, titre)
     pdf.set_xy(x + 4, y + 32)
     pdf.set_font("D", "", 9.4)
+    pdf.set_text_color(*INK)
     pdf.multi_cell(w - 8, 5.2, defi, align="L")
 
 pdf.set_y(215)
@@ -513,7 +727,7 @@ pdf.cell(60, 5, "Classe : ......................")
 pdf.cell(0, 5, "Date : ......../......../ 2026")
 
 y0 = 50
-pdf.set_fill_color(*INK)
+pdf.set_fill_color(*(IND if COULEUR else INK))
 pdf.set_text_color(255, 255, 255)
 pdf.set_font("D", "B", 7.6)
 pdf.set_xy(LM, y0)
@@ -723,11 +937,18 @@ for i, a in enumerate(AFFIRMATIONS):
 
 # deux affiches A4 paysage réduites en bas de page
 for j, (txt, x) in enumerate([("D’ACCORD", LM), ("PAS D’ACCORD", LM + w2 + 5)]):
-    pdf.set_draw_color(*INK)
-    pdf.set_line_width(1.2)
-    pdf.rect(x, 250, w2, 22)
+    colp = [VERT, ROUGE][j] if COULEUR else INK
+    if COULEUR:
+        pdf.set_fill_color(*(VERT_C if j == 0 else ROUGE_C))
+        pdf.set_draw_color(*colp)
+        pdf.set_line_width(1.2)
+        pdf.rect(x, 250, w2, 22, style="DF")
+    else:
+        pdf.set_draw_color(*INK)
+        pdf.set_line_width(1.2)
+        pdf.rect(x, 250, w2, 22)
     pdf.set_font("D", "B", 15)
-    pdf.set_text_color(*INK)
+    pdf.set_text_color(*colp)
     pdf.set_xy(x, 256.5)
     pdf.cell(w2, 8, txt, align="C")
 pdf.pied("Kit Journée du 5 novembre · CM2 · affirmations du débat mouvant")
@@ -742,12 +963,20 @@ para(pdf, "Trois élèves jouent la scène une première fois, jusqu’au bout. 
 pdf.set_y(pdf.get_y() + 2)
 for titre, roles, dial, question in SENES:
     y = pdf.get_y()
-    pdf.set_draw_color(*INK)
-    pdf.set_line_width(0.6)
-    pdf.rect(LM, y, W, 68 if len(dial) > 5 else 60)
+    if COULEUR:
+        pdf.set_fill_color(*VIO_C)
+        pdf.set_draw_color(*VIO)
+        pdf.set_line_width(0.7)
+        pdf.rect(LM, y, W, 68 if len(dial) > 5 else 60, style="DF")
+    else:
+        pdf.set_draw_color(*INK)
+        pdf.set_line_width(0.6)
+        pdf.rect(LM, y, W, 68 if len(dial) > 5 else 60)
     pdf.set_xy(LM + 3, y + 2.4)
     pdf.set_font("D", "B", 9.6)
+    pdf.set_text_color(*(VIO if COULEUR else INK))
     pdf.cell(0, 5, titre)
+    pdf.set_text_color(*INK)
     pdf.set_xy(LM + 3, y + 8)
     pdf.set_font("D", "", 7.8)
     pdf.set_text_color(*GREY)
@@ -783,7 +1012,7 @@ for i, t in enumerate([
         pdf.set_font("D", "B", 8.6)
         pdf.set_text_color(*INK)
     else:
-        pdf.set_fill_color(*INK)
+        pdf.set_fill_color(*(IND if COULEUR else INK))
         pdf.ellipse(LM, pdf.get_y() + 0.4, 6.4, 6.4, style="F")
         pdf.set_font("D", "B", 8.6)
         pdf.set_text_color(255, 255, 255)
@@ -893,8 +1122,8 @@ pdf.pied("Kit Journée du 5 novembre · tous niveaux · bandelettes du mur des a
 
 # ==================== 15. COMMUN — AFFICHE DE CLASSE ====================
 pdf.add_page()
-pdf.set_draw_color(*INK)
-pdf.set_line_width(1.3)
+pdf.set_draw_color(*(IND if COULEUR else INK))
+pdf.set_line_width(1.6 if COULEUR else 1.3)
 pdf.rect(10, 8, 190, 281)
 pdf.set_draw_color(*LINE)
 pdf.set_line_width(0.5)
@@ -910,6 +1139,7 @@ pdf.set_xy(20, 52)
 pdf.cell(0, 15, "de quelqu’un.")
 pdf.set_xy(20, 74)
 pdf.set_font("D", "", 11)
+pdf.set_text_color(*(IND if COULEUR else GREY))
 pdf.set_text_color(*GREY)
 pdf.cell(0, 6, "Affiche à compléter par les élèves : slogan, dessins, signatures.")
 # cadre dessin
@@ -948,7 +1178,7 @@ if ECO:
     pdf.set_font("D", "B", 15)
     pdf.set_text_color(*INK)
 else:
-    pdf.set_fill_color(*INK)
+    pdf.set_fill_color(*(IND if COULEUR else INK))
     pdf.rect(LM, y, W, 26, style="F")
     pdf.set_font("D", "B", 15)
     pdf.set_text_color(255, 255, 255)
@@ -1055,6 +1285,11 @@ bloc(pdf, "Quatre signes qui doivent alerter, même quand l’élève ne dit rie
     pdf.get_y() + 6)
 pdf.pied("Kit Journée du 5 novembre · fiche adulte : pièges et contacts")
 
-SORTIE = "/workspace/nah/kit-journee-5-novembre-econome.pdf" if ECO else "/workspace/nah/kit-journee-5-novembre.pdf"
+if ECO:
+    SORTIE = "/workspace/nah/kit-journee-5-novembre-econome.pdf"
+elif COULEUR:
+    SORTIE = "/workspace/nah/kit-journee-5-novembre-couleur.pdf"
+else:
+    SORTIE = "/workspace/nah/kit-journee-5-novembre.pdf"
 pdf.output(SORTIE)
 print("kit:", os.path.basename(SORTIE), os.path.getsize(SORTIE), "octets,", pdf.page_no(), "pages")
