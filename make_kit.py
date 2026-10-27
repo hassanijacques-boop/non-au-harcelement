@@ -3,6 +3,7 @@
 from fpdf import FPDF
 import os
 
+ECO = os.environ.get("ECO") == "1"     # version économe : pas d’aplats noirs
 FONT = "/home/hermeswebui/.fonts/DejaVuSans.ttf"
 FONTB = "/home/hermeswebui/.fonts/DejaVuSans-Bold.ttf"
 
@@ -34,16 +35,29 @@ class PDF(FPDF):
 
 
 def entete(pdf, surtitre, titre, sous=""):
-    pdf.set_fill_color(*INK)
-    pdf.rect(0, 0, 210, 21, style="F")
-    pdf.set_xy(LM, 4)
-    pdf.set_font("D", "", 7.4)
-    pdf.set_text_color(230, 232, 236)
-    pdf.cell(0, 4, surtitre.upper())
-    pdf.set_xy(LM, 8.4)
-    pdf.set_font("D", "B", 14)
-    pdf.set_text_color(255, 255, 255)
-    pdf.cell(0, 7, titre)
+    if ECO:
+        pdf.set_xy(LM, 4)
+        pdf.set_font("D", "", 7.4)
+        pdf.set_text_color(*GREY)
+        pdf.cell(0, 4, surtitre.upper())
+        pdf.set_xy(LM, 8.4)
+        pdf.set_font("D", "B", 14)
+        pdf.set_text_color(*INK)
+        pdf.cell(0, 7, titre)
+        pdf.set_draw_color(*INK)
+        pdf.set_line_width(0.9)
+        pdf.line(LM, 19, 210 - LM, 19)
+    else:
+        pdf.set_fill_color(*INK)
+        pdf.rect(0, 0, 210, 21, style="F")
+        pdf.set_xy(LM, 4)
+        pdf.set_font("D", "", 7.4)
+        pdf.set_text_color(230, 232, 236)
+        pdf.cell(0, 4, surtitre.upper())
+        pdf.set_xy(LM, 8.4)
+        pdf.set_font("D", "B", 14)
+        pdf.set_text_color(255, 255, 255)
+        pdf.cell(0, 7, titre)
     pdf.set_y(25)
     if sous:
         pdf.set_font("D", "", 8.6)
@@ -115,10 +129,17 @@ def carte(pdf, x, y, w, h, num, texte, taille=8.6, gras=False):
     pdf.set_dash_pattern(dash=1.4, gap=1.4)
     pdf.rect(x, y, w, h)
     pdf.set_dash_pattern()
-    pdf.set_fill_color(*INK)
-    pdf.ellipse(x + 3.5, y + 3.5, 7, 7, style="F")
-    pdf.set_font("D", "B", 8.2)
-    pdf.set_text_color(255, 255, 255)
+    if ECO:
+        pdf.set_draw_color(*INK)
+        pdf.set_line_width(0.5)
+        pdf.ellipse(x + 3.5, y + 3.5, 7, 7)
+        pdf.set_font("D", "B", 8.2)
+        pdf.set_text_color(*INK)
+    else:
+        pdf.set_fill_color(*INK)
+        pdf.ellipse(x + 3.5, y + 3.5, 7, 7, style="F")
+        pdf.set_font("D", "B", 8.2)
+        pdf.set_text_color(255, 255, 255)
     pdf.set_xy(x + 3.5, y + 4.7)
     pdf.cell(7, 4, str(num), align="C")
     pdf.set_xy(x + 12.5, y + 4.6)
@@ -224,20 +245,38 @@ pdf = PDF()
 
 # ==================== 1. MODE D'EMPLOI DU KIT ====================
 pdf.add_page()
-pdf.set_fill_color(*INK)
-pdf.rect(0, 0, 210, 34, style="F")
-pdf.set_xy(LM, 8)
-pdf.set_font("D", "B", 19)
-pdf.set_text_color(255, 255, 255)
-pdf.cell(0, 9, "Kit « Journée du 5 novembre »")
-pdf.set_xy(LM, 18)
-pdf.set_font("D", "", 9.4)
-pdf.cell(0, 5, "Journée nationale de lutte contre le harcèlement · CE2, CM1, CM2 · école élémentaire")
-pdf.set_xy(LM, 23.6)
-pdf.set_font("D", "", 8.4)
-pdf.cell(0, 5, "Sept classes · un menu par niveau · supports à découper · fiches animateur")
+if ECO:
+    pdf.set_xy(LM, 8)
+    pdf.set_font("D", "B", 19)
+    pdf.set_text_color(*INK)
+    pdf.cell(0, 9, "Kit « Journée du 5 novembre »")
+    pdf.set_xy(LM, 18)
+    pdf.set_font("D", "", 9.4)
+    pdf.set_text_color(*GREY)
+    pdf.cell(0, 5, "Journée nationale de lutte contre le harcèlement · CE2, CM1, CM2 · école élémentaire")
+    pdf.set_xy(LM, 23.6)
+    pdf.set_font("D", "", 8.4)
+    pdf.cell(0, 5, "Sept classes · un menu par niveau · supports à découper · fiches animateur")
+    pdf.set_draw_color(*INK)
+    pdf.set_line_width(1.1)
+    pdf.line(LM, 31, 210 - LM, 31)
+    pdf.set_y(38)
+else:
+    pdf.set_fill_color(*INK)
+    pdf.rect(0, 0, 210, 34, style="F")
+    pdf.set_xy(LM, 8)
+    pdf.set_font("D", "B", 19)
+    pdf.set_text_color(255, 255, 255)
+    pdf.cell(0, 9, "Kit « Journée du 5 novembre »")
+    pdf.set_xy(LM, 18)
+    pdf.set_font("D", "", 9.4)
+    pdf.cell(0, 5, "Journée nationale de lutte contre le harcèlement · CE2, CM1, CM2 · école élémentaire")
+    pdf.set_xy(LM, 23.6)
+    pdf.set_font("D", "", 8.4)
+    pdf.cell(0, 5, "Sept classes · un menu par niveau · supports à découper · fiches animateur")
+    pdf.set_y(40)
 
-h2(pdf, "Comment fonctionne ce kit", 40)
+h2(pdf, "Comment fonctionne ce kit")
 para(pdf, "Chaque classe reçoit une enveloppe : la fiche animateur de son niveau, les supports à découper et "
           "les fiches élèves. Aucune préparation à la maison, aucun matériel à acheter, aucun compte rendu "
           "à écrire. Le collègue suit la fiche, coche ce qu’il a fait, et remet la trace produite.")
@@ -737,10 +776,17 @@ for i, t in enumerate([
     "On ne joue pas son propre rôle : celui qui a été témoin dans la vraie vie peut jouer l’auteur.",
     "Le joker frappe dans ses mains : la scène s’arrête. Un élève remplace un personnage et on rejoue.",
     "On ne cherche pas le coupable : on cherche ce qui pourrait changer la situation."]):
-    pdf.set_fill_color(*INK)
-    pdf.ellipse(LM, pdf.get_y() + 0.4, 6.4, 6.4, style="F")
-    pdf.set_font("D", "B", 8.6)
-    pdf.set_text_color(255, 255, 255)
+    if ECO:
+        pdf.set_draw_color(*INK)
+        pdf.set_line_width(0.5)
+        pdf.ellipse(LM, pdf.get_y() + 0.4, 6.4, 6.4)
+        pdf.set_font("D", "B", 8.6)
+        pdf.set_text_color(*INK)
+    else:
+        pdf.set_fill_color(*INK)
+        pdf.ellipse(LM, pdf.get_y() + 0.4, 6.4, 6.4, style="F")
+        pdf.set_font("D", "B", 8.6)
+        pdf.set_text_color(255, 255, 255)
     pdf.set_xy(LM, pdf.get_y() + 1.3)
     pdf.cell(6.4, 4, str(i + 1), align="C")
     pdf.set_xy(LM + 9.5, pdf.get_y())
@@ -895,10 +941,17 @@ h2(pdf, "Le mur des mots qui réparent", 42)
 para(pdf, "À coller en haut du rouleau de papier installé dans le couloir. Chaque classe y ajoute ses cinq "
           "mots après la récréation.", size=8.6)
 y = pdf.get_y() + 2
-pdf.set_fill_color(*INK)
-pdf.rect(LM, y, W, 26, style="F")
-pdf.set_font("D", "B", 15)
-pdf.set_text_color(255, 255, 255)
+if ECO:
+    pdf.set_draw_color(*INK)
+    pdf.set_line_width(1.1)
+    pdf.rect(LM, y, W, 26)
+    pdf.set_font("D", "B", 15)
+    pdf.set_text_color(*INK)
+else:
+    pdf.set_fill_color(*INK)
+    pdf.rect(LM, y, W, 26, style="F")
+    pdf.set_font("D", "B", 15)
+    pdf.set_text_color(255, 255, 255)
 pdf.set_xy(LM, y + 6)
 pdf.cell(W, 8, "LES MOTS QU’ON VEUT ENTENDRE ICI", align="C")
 pdf.set_xy(LM, y + 15)
@@ -1002,5 +1055,6 @@ bloc(pdf, "Quatre signes qui doivent alerter, même quand l’élève ne dit rie
     pdf.get_y() + 6)
 pdf.pied("Kit Journée du 5 novembre · fiche adulte : pièges et contacts")
 
-pdf.output("/workspace/nah/kit-journee-5-novembre.pdf")
-print("kit:", os.path.getsize("/workspace/nah/kit-journee-5-novembre.pdf"), "octets,", pdf.page_no(), "pages")
+SORTIE = "/workspace/nah/kit-journee-5-novembre-econome.pdf" if ECO else "/workspace/nah/kit-journee-5-novembre.pdf"
+pdf.output(SORTIE)
+print("kit:", os.path.basename(SORTIE), os.path.getsize(SORTIE), "octets,", pdf.page_no(), "pages")
