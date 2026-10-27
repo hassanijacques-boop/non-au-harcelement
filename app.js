@@ -3,7 +3,7 @@
    Grille officielle 2025 (CE2-CM2) — passation sur tablette + interprétation
    Tout est local : aucune donnée ne quitte l’appareil.
    ========================================================================= */
-var VERSION = '20261027-5';
+var VERSION = '20261027-6';
 
 /* ------------------------------- DONNÉES -------------------------------- */
 /* d : total auquel la question appartient (A, B, C) — null = non comptée.
@@ -614,7 +614,7 @@ function vAccueil() {
   t += '<button class="btn gris" onclick="aller(\'aide\')">\u2139\uFE0F Aide</button>';
   t += '<p class="tiny muted" style="margin-top:10px">';
   if (a.n) t += a.n + ' questionnaire(s) déjà enregistré(s) sur cet appareil · ';
-  t += 'tes réponses restent dans la tablette</p>';
+  t += 'rien n’est envoyé sur Internet</p>';
   t += '<p class="tiny muted">Version ' + VERSION + '</p>';
   t += '</div></div>';
   return t;
