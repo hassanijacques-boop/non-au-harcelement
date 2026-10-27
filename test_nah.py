@@ -1,7 +1,7 @@
 import json, sys
 from playwright.sync_api import sync_playwright
 
-URL = "http://127.0.0.1:8823/index.html"
+URL = sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:8823/index.html"
 SH = "/workspace/nah/shots"
 OK, KO = [], []
 
@@ -113,7 +113,7 @@ with sync_playwright() as pw:
         if (niveau === 1) { q[1]=3; q[2]=3; q[3]=3; q[10]=3; q[11]=3; }
         if (niveau === 2) { q[1]=4; q[2]=4; q[3]=3; q[6]=4; q[7]=3; q[6]=4;
                             q[10]=4; q[12]=4; q[13]=4; q[14]=4; q[16]=3; q[18]=4; q[19]=4; q[20]=4; }
-        return {id:'T'+cl+i, ts:'2026-11-05T09:00:00Z', classe:cl, sexe:'fille', annee:'2017',
+        return {id:'T'+cl+i, dev:['DA','DB','DC'][cs.indexOf(cl)], ts:'2026-11-05T09:00:00Z', classe:cl, sexe:'fille', annee:'2017',
                 q:q, plus:{memes:'oui',aideEleve:'non',aideParent:'oui',aideAdulte:'non',ami:'oui',
                            n3018:'non',auteur:'non',temEcole:'oui',temClasse:'oui'},
                 prenom:'', fini:true};
@@ -139,7 +139,7 @@ with sync_playwright() as pw:
         p.click(".pinpad button:text-is('%s')" % c)
     p.wait_for_timeout(500)
 
-    a = p.evaluate("() => { const a = analyse(); return {n:a.n, harc:a.harc, surv:a.surv, rien:a.rien, tH:a.tauxH, tS:a.tauxS, eff:a.effectif, part:a.part, graves:a.graves, alertes:a.alertes.length}; }")
+    a = p.evaluate("() => { const a = analyse(); return {n:a.n, harc:a.harc, surv:a.surv, rien:a.rien, tH:a.tauxH, tS:a.tauxS, eff:a.effectif, part:a.part, graves:a.graves, alertes:a.alertes.length, app:a.appareils, niv:a.parNiveau}; }")
     verif("31 questionnaires analysés", a["n"] == 31, a)
     verif("4 harcèlement", a["harc"] == 4, a["harc"])
     verif("9 à surveiller", a["surv"] == 9, a["surv"])
@@ -147,6 +147,11 @@ with sync_playwright() as pw:
     verif("Effectif total 33", a["eff"] == 33, a["eff"])
     verif("Faits graves détectés", a["graves"] >= 1, a["graves"])
     verif("Alertes = harc + surv", a["alertes"] == a["harc"] + a["surv"], a["alertes"])
+    verif("3 tablettes distinctes comptées", a["app"] == 3, a["app"])
+    verif("Ventilation par niveau : 3 niveaux", [x["n"] for x in a["niv"]] == ["CE2", "CM1", "CM2"], a["niv"])
+    verif("Total par niveau = total école", sum(x["tot"] for x in a["niv"]) == a["n"], a["niv"])
+    nv = p.evaluate("() => [niveauDe('CM1/CM2 B'), niveauDe('CE2'), niveauDe('CM2 A'), niveauDe('CP'), niveauDe('CM1')]")
+    verif("Niveau déduit du nom de classe", nv == ["CM1/CM2", "CE2", "CM2", "Autre", "CM1"], nv)
     p.screenshot(path=SH + "/07-vue-ensemble.png", full_page=True)
 
     txt = p.inner_text("#app")
@@ -166,6 +171,7 @@ with sync_playwright() as pw:
         if ong == "Par classe":
             verif("Tableau par classe : lignes CE2/CM1/CM2", all(x in tt for x in ["CE2", "CM1", "CM2", "École"]))
             verif("Tableau par classe : taux de participation", "100 %" in tt, tt[:200])
+            verif("Tableau par niveau présent", "Résultats par niveau" in tt)
         if ong == "Par question":
             verif("24 barres de questions", p.locator(".bars").first.locator(".bar").count() == 24,
                   p.locator(".bars").first.locator(".bar").count())
@@ -174,6 +180,7 @@ with sync_playwright() as pw:
     # ---------- 5. RAPPORT IMPRIMABLE ----------
     p.click(".tab:text-is('Rapport')")
     p.wait_for_timeout(300)
+    verif("Rapport : tableau par niveau", "Résultats par niveau" in p.inner_text("#app"))
     p.screenshot(path=SH + "/10-rapport-ecran.png", full_page=True)
     p.emulate_media(media="print")
     p.pdf(path="/workspace/nah/shots/rapport.pdf", format="A4", print_background=True)
@@ -187,6 +194,9 @@ with sync_playwright() as pw:
     p.click(".tab:text-is('Données')")
     p.wait_for_timeout(200)
     verif("Boutons export présents", "Sauvegarde complète" in p.inner_text("#app"))
+    td = p.inner_text("#app")
+    verif("Liste des tablettes affichée", "Tablettes enregistrées" in td)
+    verif("3 tablettes listées", "3 tablette(s)" in td, td[-300:])
     with p.expect_download() as dl:
         p.click("text=Sauvegarde complète")
     d = dl.value
@@ -210,6 +220,18 @@ with sync_playwright() as pw:
     p.wait_for_timeout(600)
     mess = p.evaluate("() => DB.rep.length")
     verif("Réimport du même fichier : aucun doublon", mess == 31, mess)
+
+    # fusion d'un fichier venu d'une 4e tablette
+    extra = json.load(open(chemin))
+    r0 = dict(extra["rep"][0]); r0["id"] = "TEXTRA1"; r0["dev"] = "DZ"
+    extra["rep"] = [r0]
+    json.dump(extra, open("/tmp/nah-extra.json", "w"))
+    p.set_input_files("#fj", "/tmp/nah-extra.json")
+    p.wait_for_timeout(700)
+    verif("Nouvelle tablette détectée après fusion", p.evaluate("() => analyse().appareils") == 4,
+          p.evaluate("() => analyse().appareils"))
+    verif("Questionnaire de la 4e tablette ajouté", p.evaluate("() => DB.rep.length") == 32,
+          p.evaluate("() => DB.rep.length"))
 
     # ---------- 7. MOBILE ----------
     ctx2 = br.new_context(viewport={"width": 390, "height": 844}, locale="fr-FR",

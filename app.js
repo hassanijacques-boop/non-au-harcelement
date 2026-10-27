@@ -3,7 +3,7 @@
    Grille officielle 2025 (CE2-CM2) — passation sur tablette + interprétation
    Tout est local : aucune donnée ne quitte l’appareil.
    ========================================================================= */
-var VERSION = '20261027-1';
+var VERSION = '20261027-2';
 
 /* ------------------------------- DONNÉES -------------------------------- */
 /* d : total auquel la question appartient (A, B, C) — null = non comptée.
@@ -142,7 +142,8 @@ var DB = {
     classesTxt: 'CE2 ; 0\nCM1 ; 0\nCM2 ; 0',
     pin: '2026',
     auto: false,
-    resp: ''
+    resp: '',
+    dev: ''
   },
   rep: []
 };
@@ -211,6 +212,29 @@ function barre(num, label, p, col) {
 }
 function arr(n) { var a = []; for (var i = 0; i < n; i++) a.push(i); return a; }
 function somme(a) { var t = 0; for (var i = 0; i < a.length; i++) t += a[i]; return t; }
+
+/* Tablettes d’origine des réponses (pour vérifier qu’aucune n’a été oubliée à la fusion) */
+function appareils(reps) {
+  var vus = {}, out = [], i;
+  for (i = 0; i < reps.length; i++) {
+    var d = reps[i].dev || 'origine';
+    if (!vus[d]) { vus[d] = { id: d, n: 0, dernier: '' }; out.push(vus[d]); }
+    vus[d].n++;
+    if (reps[i].ts && reps[i].ts > vus[d].dernier) vus[d].dernier = reps[i].ts;
+  }
+  return out;
+}
+
+/* Niveau déduit du nom de la classe : « CM1/CM2 B » → « CM1/CM2 » */
+function niveauDe(nom) {
+  var t = String(nom || '').toUpperCase(), lv = [];
+  if (t.indexOf('CE1') !== -1) lv.push('CE1');
+  if (t.indexOf('CE2') !== -1) lv.push('CE2');
+  if (t.indexOf('CM1') !== -1) lv.push('CM1');
+  if (t.indexOf('CM2') !== -1) lv.push('CM2');
+  if (!lv.length) return 'Autre';
+  return lv.join('/');
+}
 
 /* -------------------------------- SCORES --------------------------------- */
 function seuil(q) { return q.d === 'C' ? 2 : 3; }
@@ -333,6 +357,26 @@ function analyse() {
       res.parClasse.push(e2);
     }
   }
+  // par niveau (CE2 / CM1 / CM2), déduit du nom de la classe
+  var niv = {}, ordre = ['CE1', 'CE2', 'CM1', 'CM2'];
+  res.parNiveau = [];
+  for (j = 0; j < n; j++) {
+    var lv = niveauDe(rep[j].classe);
+    if (!niv[lv]) { niv[lv] = { n: lv, tot: 0, h: 0, s: 0, r: 0 }; res.parNiveau.push(niv[lv]); }
+    niv[lv].tot++;
+    if (stats[j].statut === 'harc') niv[lv].h++;
+    else if (stats[j].statut === 'surv') niv[lv].s++;
+    else niv[lv].r++;
+  }
+  res.parNiveau.sort(function (x, y) {
+    var ix = ordre.indexOf(x.n), iy = ordre.indexOf(y.n);
+    if (ix < 0) ix = 9;
+    if (iy < 0) iy = 9;
+    if (ix !== iy) return ix - iy;
+    return x.n > y.n ? 1 : (x.n < y.n ? -1 : 0);
+  });
+  res.appareils = appareils(rep).length;
+
   res.part = pct(n, res.effectif);
   return res;
 }
@@ -471,6 +515,13 @@ function syntheseTexte(a) {
     var c = a.parClasse[i];
     if (!c.tot) continue;
     t += '- ' + c.n + ' : ' + c.tot + ' réponses, ' + c.h + ' harcèlement, ' + c.s + ' à surveiller\n';
+  }
+  if (a.parNiveau && a.parNiveau.length) {
+    t += '\nPAR NIVEAU\n';
+    for (i = 0; i < a.parNiveau.length; i++) {
+      var nvp = a.parNiveau[i];
+      t += '- ' + nvp.n + ' : ' + nvp.tot + ' réponses, ' + nvp.h + ' harcèlement, ' + nvp.s + ' à surveiller\n';
+    }
   }
   t += '\nINTERPRÉTATION\n';
   var L = interpretation(a);
@@ -767,6 +818,7 @@ function terminer() {
   cur.prenom = el ? String(el.value || '').replace(/^\s+|\s+$/g, '').slice(0, 30) : '';
   cur.fini = true;
   cur.id = 'R' + Date.now() + Math.floor(Math.random() * 900 + 100);
+  cur.dev = DB.cfg.dev || '';
   cur.ts = new Date().toISOString();
   cur.duree = Math.round((Date.now() - cur.debut) / 1000);
   DB.rep.push(cur);
@@ -881,6 +933,11 @@ function tabVue() {
   t += '<div class="kpi g"><div class="v">' + nf(pct(a.rien, a.n)) + '<span style="font-size:1rem"> %</span></div><div class="l">Sans difficulté<br>' + a.rien + ' élève(s)</div></div>';
   t += '</div>';
 
+  t += '<p class="tiny muted" style="margin:-4px 0 12px 2px">' +
+       (a.appareils > 1
+         ? '\uD83D\uDCF1 Résultats fusionnés de <b>' + a.appareils + ' tablettes</b> — vérifiez que c’est bien le nombre attendu.'
+         : '\uD83D\uDCF1 Réponses enregistrées sur cet appareil uniquement.') + '</p>';
+
   // comparaison visuelle
   t += '<div class="card"><h2>Comparaison avec le baromètre national 2025</h2>';
   t += '<div class="comp">';
@@ -932,6 +989,22 @@ function tabClasses() {
   t += '</tbody></table></div>';
   t += '<p class="tiny muted" style="margin-top:10px">Renseignez les effectifs dans l’onglet Réglages pour obtenir les taux de participation.</p>';
   if (a.incomplets) t += '<p class="small muted">' + a.incomplets + ' questionnaire(s) commencé(s) mais non terminé(s) — non comptés.</p>';
+
+  if (a.parNiveau.length) {
+    t += '<h3 style="margin-top:22px">Résultats par niveau</h3>';
+    t += '<div class="tbl"><table><thead><tr><th>Niveau</th><th class="num">Réponses</th><th class="num">Harcèl.</th><th class="num">À surveiller</th><th class="num">Sans diff.</th><th class="num">% harcèl.</th></tr></thead><tbody>';
+    for (var k = 0; k < a.parNiveau.length; k++) {
+      var nv = a.parNiveau[k];
+      t += '<tr><td><b>' + esc(nv.n) + '</b></td><td class="num">' + nv.tot + '</td>';
+      t += '<td class="num">' + (nv.h ? '<span class="badge b-h">' + nv.h + '</span>' : '0') + '</td>';
+      t += '<td class="num">' + (nv.s ? '<span class="badge b-s">' + nv.s + '</span>' : '0') + '</td>';
+      t += '<td class="num">' + nv.r + '</td>';
+      t += '<td class="num">' + nf(pct(nv.h, nv.tot)) + ' %</td></tr>';
+    }
+    t += '</tbody></table></div>';
+    t += '<p class="tiny muted" style="margin-top:8px">Le niveau est déduit du nom de la classe : une classe à cours multiple apparaît sous son niveau réel, par exemple « CM1/CM2 ».</p>';
+  }
+
   t += '</div>';
   return t;
 }
@@ -1024,6 +1097,15 @@ function tabRapport() {
   }
   t += '<tr class="tot"><td>École</td><td class="num">' + (a.effectif || '—') + '</td><td class="num">' + a.n + '</td><td class="num">' + a.harc + '</td><td class="num">' + a.surv + '</td><td class="num">' + a.rien + '</td></tr>';
   t += '</tbody></table></div>';
+
+  if (a.parNiveau.length) {
+    t += '<h3>Résultats par niveau</h3><div class="tbl"><table><thead><tr><th>Niveau</th><th class="num">Réponses</th><th class="num">Harcèlement</th><th class="num">À surveiller</th><th class="num">Sans difficulté</th></tr></thead><tbody>';
+    for (var w = 0; w < a.parNiveau.length; w++) {
+      var np = a.parNiveau[w];
+      t += '<tr><td>' + esc(np.n) + '</td><td class="num">' + np.tot + '</td><td class="num">' + np.h + '</td><td class="num">' + np.s + '</td><td class="num">' + np.r + '</td></tr>';
+    }
+    t += '</tbody></table></div>';
+  }
   t += '</div>';
 
   // page 2
@@ -1091,6 +1173,21 @@ function tabDonnees() {
   t += '<button class="btn gris" onclick="exportCSV()">\uD83D\uDCCA Tableau anonyme (.csv)</button>';
   t += '<p class="tiny muted" style="margin:-2px 0 0 2px">Pour Excel ou LibreOffice. Sans prénom.</p>';
   t += '</div></div>';
+
+  var ap = appareils(DB.rep);
+  t += '<div class="card"><h2>Tablettes enregistrées</h2>';
+  if (!ap.length) {
+    t += '<p class="small muted">Aucune réponse pour l’instant.</p></div>';
+  } else {
+    t += '<div class="tbl"><table><thead><tr><th>Tablette</th><th class="num">Questionnaires</th></tr></thead><tbody>';
+    for (var q = 0; q < ap.length; q++) {
+      t += '<tr><td>' + (ap[q].id === 'origine' ? '<span class="muted">Avant le suivi</span>' : esc(ap[q].id)) +
+           '</td><td class="num">' + ap[q].n + '</td></tr>';
+    }
+    t += '<tr class="tot"><td>Total</td><td class="num">' + ap.length + ' tablette(s)</td></tr>';
+    t += '</tbody></table></div>';
+    t += '<p class="tiny muted" style="margin-top:8px">Après fusion, cette liste doit contenir toutes les tablettes utilisées. S’il en manque une, importez son fichier .json ci-dessous.</p></div>';
+  }
 
   t += '<div class="card"><h2>Fusionner plusieurs tablettes</h2>';
   t += '<p class="small">Si la passation a été faite sur plusieurs tablettes, choisissez le fichier .json exporté depuis chaque tablette. Les doublons sont automatiquement écartés.</p>';
@@ -1222,6 +1319,10 @@ function saveCfg() {
 
 /* ------------------------------- DÉMARRAGE -------------------------------- */
 charger();
+if (!DB.cfg.dev) {
+  DB.cfg.dev = 'D' + Math.random().toString(36).slice(2, 5).toUpperCase();
+  sauver();
+}
 if (window.speechSynthesis) {
   try { window.speechSynthesis.onvoiceschanged = function () {}; } catch (e) {}
 }
