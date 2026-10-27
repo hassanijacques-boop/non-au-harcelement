@@ -3,7 +3,7 @@
    Grille officielle 2025 (CE2-CM2) — passation sur tablette + interprétation
    Tout est local : aucune donnée ne quitte l’appareil.
    ========================================================================= */
-var VERSION = '20261027-3';
+var VERSION = '20261027-4';
 
 /* ------------------------------- DONNÉES -------------------------------- */
 /* d : total auquel la question appartient (A, B, C) — null = non comptée.
@@ -134,12 +134,17 @@ var PLUS = [
 var ANNEES = ['2018 ou après', '2017', '2016', '2015', '2014 ou avant'];
 var CLE = 'nah_v1';
 
+/* Les classes de l’école, pré-remplies : ainsi les 10 tablettes sont prêtes
+   sans réglage. Modifiable dans Réglages (le « ; » sépare nom et effectif). */
+var CLASSES_DEFAUT = 'CE2 A ; 0\nCE2 B ; 0\nCM1 A ; 0\nCM1 B ; 0\nCM1 C ; 0\nCM2 ; 0\nCM1/CM2 ; 0';
+var ANCIEN_DEFAUT = 'CE2 ; 0\nCM1 ; 0\nCM2 ; 0';
+
 /* ------------------------------- STOCKAGE -------------------------------- */
 var DB = {
   cfg: {
     nom: 'École primaire publique La Rose',
     circo: 'IEN Bandraboua — Mayotte Nord',
-    classesTxt: 'CE2 ; 0\nCM1 ; 0\nCM2 ; 0',
+    classesTxt: CLASSES_DEFAUT,
     pin: '2026',
     auto: false,
     resp: '',
@@ -157,6 +162,7 @@ function charger() {
         for (var k in DB.cfg) { if (o.cfg[k] !== undefined) DB.cfg[k] = o.cfg[k]; }
       }
       if (o && o.rep && o.rep.length !== undefined) DB.rep = o.rep;
+      if (DB.cfg.classesTxt === ANCIEN_DEFAUT) DB.cfg.classesTxt = CLASSES_DEFAUT;
     }
   } catch (e) {}
 }
@@ -1296,7 +1302,8 @@ function tabConfig() {
   t += '<div class="card"><h2>Classes et effectifs</h2>';
   t += '<p class="small muted">Une classe par ligne, au format <b>Nom ; effectif</b>. Les effectifs servent au taux de participation.</p>';
   t += '<textarea id="ccls" rows="6" style="width:100%;padding:13px;border:2px solid #dde3ee;border-radius:12px;font-family:inherit;font-size:1rem;line-height:1.7">' + esc(DB.cfg.classesTxt) + '</textarea>';
-  t += '<p class="tiny muted">Exemple : <b>CM1/CM2 B ; 27</b></p></div>';
+  t += '<p class="tiny muted">Exemple : <b>CM1/CM2 B ; 27</b></p>';
+  t += '<p class="tiny muted" style="margin-top:6px">Cette liste doit être la même sur toutes les tablettes, sinon les élèves ne choisiront pas la même classe. Elle est déjà pré-remplie pour les 7 classes de l’école.</p></div>';
 
   t += '<div class="card"><h2>Code d’accès adulte</h2>';
   t += '<p class="small muted">4 chiffres. Il empêche les élèves d’ouvrir les résultats.</p>';
