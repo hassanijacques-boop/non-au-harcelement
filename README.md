@@ -5,9 +5,12 @@ Application de passation de la **grille d’auto-évaluation officielle** sur le
 
 ## Ce que fait l’application
 
-1. **Passation sur tablette** : les 24 questions officielles, une par écran, avec reformulation en
-   français simple, pictogrammes, lecture à voix haute et 4 modalités de réponse (Jamais, Parfois,
-   Souvent, Très souvent). Puis les 9 questions complémentaires (oui/non), puis le prénom facultatif.
+1. **Saisie par l’enseignant (méthode retenue)** : les élèves remplissent la grille papier en classe,
+   puis chaque enseignant recopie les résultats de sa classe dans une grille de saisie (24 questions +
+   9 oui/non sur un seul écran), au clavier — touches 1 à 4, Entrée pour enregistrer, une minute par
+   questionnaire. La classe est choisie une fois pour toute la série.
+   **Passation directe sur tablette** également disponible : une question par écran, lecture à voix
+   haute, reformulation en français simple, pour un élève isolé ou un petit groupe.
 2. **Calcul conforme à la grille** : total A = réponses 3 et 4 aux questions 2 à 8 ; total B =
    réponses 3 et 4 aux questions 11 à 20 ; total C = réponses 2, 3 et 4 aux questions 21 à 24.
    Croisement A × (B+C) dans la table officielle → *harcèlement* / *à surveiller* / *pas de difficulté*.

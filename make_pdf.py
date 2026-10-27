@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Mode d'emploi / protocole — application « Non au harcèlement » (fpdf2 + DejaVu)."""
+"""Protocole de passation papier + saisie — application « Non au harcèlement »."""
 from fpdf import FPDF
 import os
 
@@ -7,7 +7,7 @@ FONT = "/home/hermeswebui/.fonts/DejaVuSans.ttf"
 FONTB = "/home/hermeswebui/.fonts/DejaVuSans-Bold.ttf"
 SH = "/workspace/nah"
 URL = "https://hassanijacques-boop.github.io/non-au-harcelement/"
-VERSION = "20261027-4"
+VERSION = "20261027-5"
 
 IND = (67, 56, 202)
 IND_L = (238, 242, 255)
@@ -33,32 +33,33 @@ class PDF(FPDF):
         self.set_y(-12)
         self.set_font("D", "", 7.2)
         self.set_text_color(*GREY)
-        self.cell(0, 6, "Non au harcèlement — protocole de passation · " + URL + " · v" + VERSION)
+        self.cell(0, 6, "Non au harcèlement — protocole papier et saisie · " + URL + " · v" + VERSION)
         self.set_y(-12)
         self.cell(0, 6, "page %d" % self.page_no(), align="R")
 
 
-def bandeau(pdf, titre, sous1, sous2):
+def bandeau(pdf, titre, sous1, sous2, h=34):
     pdf.set_fill_color(*IND)
-    pdf.rect(0, 0, 210, 34, style="F")
+    pdf.rect(0, 0, 210, h, style="F")
     pdf.set_xy(LM, 7.5)
     pdf.set_font("D", "B", 18)
     pdf.set_text_color(255, 255, 255)
     pdf.cell(0, 9, titre)
     pdf.set_xy(LM, 17)
-    pdf.set_font("D", "", 9.6)
+    pdf.set_font("D", "", 9.4)
     pdf.cell(0, 5, sous1)
-    pdf.set_xy(LM, 23)
-    pdf.set_font("D", "", 8.4)
-    pdf.cell(0, 5, sous2)
-    pdf.set_y(40)
+    if sous2:
+        pdf.set_xy(LM, 22.5)
+        pdf.set_font("D", "", 8.3)
+        pdf.multi_cell(174, 4.6, sous2, align="L")
+    pdf.set_y(h + 6)
 
 
 def h1(pdf, txt, y=None):
     if y:
         pdf.set_y(y)
     else:
-        pdf.ln(1)
+        pdf.ln(0.5)
     pdf.set_font("D", "B", 14.5)
     pdf.set_text_color(*IND)
     pdf.set_x(LM)
@@ -67,7 +68,7 @@ def h1(pdf, txt, y=None):
     pdf.ln(1.6)
 
 
-def h2(pdf, txt, color=INK, avant=2.6):
+def h2(pdf, txt, color=INK, avant=2.4):
     if pdf.get_y() > 248:
         pdf.add_page()
     pdf.ln(avant)
@@ -77,7 +78,7 @@ def h2(pdf, txt, color=INK, avant=2.6):
     pdf.multi_cell(W, 6.0, txt, align="L")
     pdf.set_x(LM)
     pdf.set_text_color(*INK)
-    pdf.ln(1.0)
+    pdf.ln(0.9)
 
 
 def para(pdf, txt, size=9.2, color=INK, lh=5.15):
@@ -90,7 +91,7 @@ def para(pdf, txt, size=9.2, color=INK, lh=5.15):
 
 
 def puce(pdf, titre, txt, color=IND, size=9.1):
-    if pdf.get_y() > 264:
+    if pdf.get_y() > 263:
         pdf.add_page()
     contenu = ("**" + titre + "** : " + txt) if titre else txt
     pdf.set_font("D", "", size)
@@ -98,7 +99,7 @@ def puce(pdf, titre, txt, color=IND, size=9.1):
     pdf.set_x(LM)
     pdf.multi_cell(W, 5.15, "•  " + contenu, align="L", markdown=True)
     pdf.set_x(LM)
-    pdf.ln(1.2)
+    pdf.ln(1.15)
 
 
 def num(pdf, n, titre, lignes):
@@ -119,7 +120,7 @@ def num(pdf, n, titre, lignes):
         pdf.set_x(LM + 10.5)
         pdf.set_font("D", "", 9)
         pdf.multi_cell(W - 10.5, 5.0, l, align="L")
-    pdf.ln(1.6)
+    pdf.ln(1.5)
 
 
 def encadre(pdf, titre, lignes, bg=(255, 251, 235), bord=(253, 230, 138), tc=ORANGE, size=8.8):
@@ -151,7 +152,6 @@ def encadre(pdf, titre, lignes, bg=(255, 251, 235), bord=(253, 230, 138), tc=ORA
 
 
 def tableau_croisement(pdf):
-    """Reproduction de la table officielle : A en lignes, B+C en colonnes."""
     lignes = ["0", "1 ou 2", "3 à 4", "5 ou plus"]
     cols = ["0", "1 ou 2", "3 ou 4", "5 à 7", "8 ou plus"]
     T = [["rien", "rien", "surv", "surv", "harc"],
@@ -162,14 +162,11 @@ def tableau_croisement(pdf):
             "surv": ((253, 230, 138), (140, 80, 10)),
             "rien": ((236, 253, 243), (20, 110, 60))}
     x0 = LM
-    wl = 30      # colonne des libellés
-    wc = 22.8    # largeur d’une colonne
-    hh = 7
-    # en-tête
+    wl, wc, hh = 30, 22.8, 7
     pdf.set_fill_color(*IND)
     pdf.set_text_color(255, 255, 255)
     pdf.set_font("D", "B", 8.4)
-    pdf.set_xy(x0, pdf.get_y())
+    pdf.set_x(x0)
     pdf.cell(wl, hh, "Total A", border=1, fill=True, align="C")
     pdf.cell(wc * 5, hh, "Total B + Total C", border=1, fill=True, align="C")
     pdf.ln()
@@ -179,11 +176,11 @@ def tableau_croisement(pdf):
     for c in cols:
         pdf.cell(wc, hh, c, border=1, fill=True, align="C")
     pdf.ln()
-    pdf.set_font("D", "", 8.4)
     for i, lab in enumerate(lignes):
         pdf.set_x(x0)
         pdf.set_fill_color(*IND_L)
         pdf.set_text_color(*INK)
+        pdf.set_font("D", "", 8.4)
         pdf.cell(wl, hh, lab, border=1, fill=True, align="C")
         for j in range(5):
             st = T[i][j]
@@ -199,58 +196,66 @@ def tableau_croisement(pdf):
 
 def fiche_suivi(pdf):
     pdf.add_page()
-    bandeau(pdf, "Fiche de suivi des tablettes",
-            "À imprimer et à garder près des tablettes pendant toute la campagne",
-            "Une ligne par tablette · cocher au fur et à mesure · l’export est la seule sauvegarde")
-    pdf.set_y(42)
-    pdf.set_font("D", "B", 9.6)
+    bandeau(pdf, "Fiche de suivi de la campagne",
+            "À tenir par le directeur pendant toute la période de passation",
+            "Une ligne par classe · cocher au fur et à mesure · l’export est la seule sauvegarde")
+    pdf.set_y(44)
+    pdf.set_font("D", "B", 9.4)
     pdf.set_text_color(*INK)
-    pdf.cell(60, 7, "École : " + "." * 40, border=0)
-    pdf.set_x(120)
-    pdf.cell(0, 7, "Période : …… / …… / 2026  →  …… / …… / 2026")
-    pdf.ln(11)
+    pdf.set_x(LM)
+    pdf.cell(0, 7, "École : " + "." * 46)
+    pdf.ln(9)
+    pdf.set_x(LM)
+    pdf.cell(0, 7, "Période de passation : du ....... / ....... / 2026  au  ....... / ....... / 2026")
+    pdf.ln(12)
 
-    cols = [("N°", 10), ("Classe(s) passée(s) sur cette tablette", 74), ("Date", 26),
-            ("Export .json fait", 32), ("Importé sur le PC", 32)]
+    cols = [("Classe", 30), ("Enseignant", 40), ("Grilles\nremplies", 22),
+            ("Saisie\nfaite", 20), ("Export\n.json", 20), ("Importé\nsur le PC", 42)]
     pdf.set_fill_color(*IND)
     pdf.set_text_color(255, 255, 255)
-    pdf.set_font("D", "B", 8.2)
+    pdf.set_font("D", "B", 7.8)
     pdf.set_x(LM)
     for nom, w in cols:
-        pdf.cell(w, 8, nom, border=1, fill=True, align="C")
-    pdf.ln()
-    pdf.set_text_color(*INK)
-    pdf.set_font("D", "", 9)
-    hb = 13.5
-    for i in range(1, 11):
+        x, y = pdf.get_x(), pdf.get_y()
+        pdf.multi_cell(w, 3.6, nom, border=1, fill=True, align="C")
+        pdf.set_xy(x + w, y)
+    pdf.ln(8.6)
+
+    classes = ["CE2 A", "CE2 B", "CM1 A", "CM1 B", "CM1 C", "CM2", "CM1/CM2", "", "", ""]
+    hb = 13.0
+    for cl in classes:
         pdf.set_x(LM)
-        pdf.cell(10, hb, str(i), border=1, align="C")
-        pdf.cell(74, hb, "", border=1)
-        pdf.cell(26, hb, "", border=1)
-        for k in range(2):
+        pdf.set_text_color(*INK)
+        pdf.set_font("D", "B", 8.6)
+        pdf.cell(30, hb, cl, border=1, align="C")
+        pdf.set_font("D", "", 9)
+        pdf.cell(40, hb, "", border=1)
+        pdf.cell(22, hb, "", border=1)
+        for k in range(3):
+            w = [20, 20, 42][k]
             x = pdf.get_x()
-            pdf.cell(32, hb, "", border=1)
+            pdf.cell(w, hb, "", border=1)
             pdf.set_draw_color(150, 155, 170)
             pdf.set_line_width(0.35)
-            pdf.rect(x + 2.5, pdf.get_y() + hb / 2 - 3.2, 6.4, 6.4)
+            pdf.rect(x + w / 2 - 3.2, pdf.get_y() + hb / 2 - 3.2, 6.4, 6.4)
         pdf.ln()
 
-    pdf.ln(4)
-    pdf.set_draw_color(*LINE)
+    pdf.ln(3)
     pdf.set_font("D", "", 8.4)
-    for txt in ["Total des tablettes utilisées : ....................        Total des fichiers importés sur le PC : ....................",
-                "Le PC affiche « X tablette(s) » dans l’onglet Données : ce nombre doit être identique aux deux lignes ci-dessus.",
-                "Signature de l’adulte responsable : ..................................................        Date : ....... / ....... / 2026"]:
+    for txt in ["Nombre de classes ayant rendu leur saisie : ................ / 7",
+                "Nombre de postes affiché par le PC dans l’onglet Données : ................",
+                "Ces deux nombres doivent être identiques avant tout envoi à la circonscription.",
+                "Signature du directeur : ..................................................        Date : ....... / ....... / 2026"]:
         pdf.set_x(LM)
-        pdf.cell(0, 6.5, txt)
-        pdf.ln(6.5)
+        pdf.cell(0, 6.4, txt)
+        pdf.ln(6.4)
 
-    pdf.ln(2)
+    pdf.ln(1)
     encadre(pdf, "Rappel",
-            ["Une tablette qui n’est pas exportée avant que quelqu’un vide l’historique de Chrome perd ses "
-             "réponses : il n’y a pas de rattrapage possible.",
-             "Le nom du fichier exporté contient la date et l’heure : renommez-le avec le numéro de la "
-             "tablette (tablette-3.json) pour vous y retrouver."],
+            ["Un poste dont l’historique Chrome est vidé perd ses réponses : il n’y a pas de rattrapage "
+             "possible. L’export est donc à faire dès que la classe a terminé sa saisie.",
+             "Les grilles papier, elles, restent la pièce de référence : elles sont conservées par l’école "
+             "jusqu’à la fin de l’année scolaire."],
             bg=(254, 242, 242), bord=(254, 202, 202), tc=ROUGE)
 
 
@@ -260,223 +265,286 @@ pdf = PDF()
 pdf.add_page()
 bandeau(pdf, "Non au harcèlement",
         "Enquête d’auto-évaluation · école élémentaire CE2-CM2 · année scolaire 2026-2027",
-        "Protocole de passation, d’exploitation et de restitution — à l’attention des professeurs, du directeur, du CPC et de l’IEN")
+        "Protocole de passation sur papier et de saisie des résultats — à l’attention des professeurs, "
+        "du directeur, du CPC et de l’IEN")
 
-h1(pdf, "Ouvrir l’application", 40)
-pdf.set_font("D", "", 9.1)
+h1(pdf, "Le principe retenu cette année", 40)
+para(pdf,
+     "Les élèves remplissent la grille officielle sur papier, en classe, comme les années précédentes. "
+     "Chaque enseignant recopie ensuite les résultats de sa classe dans l’application. L’application "
+     "calcule les trois indices officiels, situe chaque élève dans la table de croisement, rédige "
+     "l’interprétation et produit le rapport destiné à la circonscription.")
+pdf.ln(1)
+para(pdf, "Ce qui change : l’exploitation. Les grilles étaient remplies, mais les résultats n’étaient pas "
+          "interprétés. Ici, l’interprétation est automatique, identique pour toutes les classes, et "
+          "disponible le soir même.", color=IND)
+
+h2(pdf, "Les deux étapes")
+num(pdf, 1, "La passation en classe, sur papier", [
+    "Le professeur présente la grille, lit la mention informative, explique les quatre modalités de "
+    "réponse, puis laisse les élèves remplir. Les grilles sont ramassées par le professeur."])
+num(pdf, 2, "La saisie par l’enseignant, dans l’application", [
+    "Chaque enseignant recopie les réponses de sa classe, un questionnaire par écran, au clavier. "
+    "Une minute environ par questionnaire, soit 25 minutes pour une classe de 25."])
+
+h2(pdf, "Ouvrir l’application")
+y0 = pdf.get_y()
+pdf.set_font("D", "", 9.0)
 pdf.set_text_color(*INK)
 pdf.set_x(LM)
-pdf.multi_cell(108, 5.1,
-    "Sur chaque tablette : ouvrir Chrome, taper l’adresse ci-dessous, ou scanner le QR code. Puis, "
-    "dans le menu de Chrome (trois points en haut à droite), choisir « Ajouter à l’écran d’accueil » : "
-    "l’application s’installe comme une application ordinaire et fonctionne ensuite sans connexion.",
-    align="L")
-pdf.ln(2)
-pdf.set_font("D", "B", 9.0)
+pdf.multi_cell(104, 5.0,
+    "Sur un ordinateur ou une tablette : ouvrir Chrome, taper l’adresse ci-dessous, ou scanner le QR code. "
+    "Puis, dans le menu de Chrome (trois points en haut à droite), choisir « Ajouter à l’écran d’accueil » : "
+    "l’application s’installe et fonctionne ensuite sans connexion.", align="L")
+pdf.ln(1.6)
+pdf.set_font("D", "B", 8.9)
 pdf.set_text_color(*IND)
 pdf.set_x(LM)
-pdf.multi_cell(108, 4.6, "hassanijacques-boop.github.io/", align="L")
+pdf.multi_cell(104, 4.5, "hassanijacques-boop.github.io/", align="L")
 pdf.set_x(LM)
-pdf.multi_cell(108, 4.6, "non-au-harcelement/", align="L")
-pdf.ln(1)
-pdf.set_font("D", "", 8.2)
+pdf.multi_cell(104, 4.5, "non-au-harcelement/", align="L")
+pdf.ln(0.6)
+pdf.set_font("D", "", 8.1)
 pdf.set_text_color(*GREY)
 pdf.set_x(LM)
-pdf.multi_cell(108, 4.5, "Aucun compte · aucun magasin d’applications · aucun paiement · aucune donnée envoyée sur Internet", align="L")
-pdf.set_font("D", "B", 8.2)
+pdf.multi_cell(104, 4.4, "Aucun compte · aucun paiement · aucune donnée envoyée sur Internet", align="L")
+pdf.set_font("D", "B", 8.1)
 pdf.set_text_color(*INK)
 pdf.set_x(LM)
-pdf.multi_cell(108, 4.5, "Version de référence de ce document : " + VERSION, align="L")
+pdf.multi_cell(104, 4.4, "Version de référence de ce document : " + VERSION, align="L")
 pdf.set_font("D", "B", 9.0)
 pdf.set_text_color(*VERT)
 pdf.set_x(LM)
-pdf.multi_cell(108, 4.8, "Code d’accès adulte : 2026 (modifiable dans Réglages)", align="L")
-pdf.set_text_color(*INK)
-
-pdf.image(SH + "/qr-code.png", x=138, y=42, w=34)
-pdf.set_xy(138, 77)
-pdf.set_font("D", "", 7.2)
+pdf.multi_cell(104, 4.8, "Code d’accès adulte : 2026", align="L")
+pdf.set_font("D", "", 7.8)
 pdf.set_text_color(*GREY)
-pdf.multi_cell(44, 4.0, "À scanner avec l’appareil photo de la tablette", align="C")
+pdf.set_x(LM)
+pdf.multi_cell(104, 4.2, "(modifiable dans Espace adulte → Réglages)", align="L")
+y1 = pdf.get_y()
 
-pdf.set_y(101)
-h1(pdf, "L’essentiel en dix lignes", 108)
-para(pdf,
-     "La grille d’auto-évaluation officielle est passée sur tablette par tous les élèves du CE2 au CM2, "
-     "pendant la période fixée par le guide de passation. L’application calcule elle-même les trois indices "
-     "officiels, situe chaque élève dans la table de croisement, produit l’interprétation et le rapport "
-     "destiné à la circonscription. L’exploitation des résultats — qui faisait défaut les années "
-     "précédentes — est donc automatique et identique pour toutes les classes.")
-pdf.ln(1.5)
+pdf.image(SH + "/qr-code.png", x=141, y=y0, w=30)
+pdf.set_xy(134, y0 + 31)
+pdf.set_font("D", "", 6.8)
+pdf.set_text_color(*GREY)
+pdf.multi_cell(44, 3.8, "À scanner avec l’appareil photo", align="C")
 
-h2(pdf, "Ce que fait l’application", avant=1)
-puce(pdf, "Un résultat par élève", "zone « harcèlement », zone « à surveiller » ou absence de difficulté, selon la table officielle.")
-puce(pdf, "Des résultats par classe et par niveau", "les deux CE2 se cumulent sous « CE2 », les trois CM1 sous « CM1 » ; la classe à cours multiple apparaît sous « CM1/CM2 ».")
-puce(pdf, "Une interprétation rédigée", "comparée aux repères nationaux du baromètre 2025 (3 % en harcèlement, 13 % à surveiller chez les écoliers).")
-puce(pdf, "Un rapport A4 et une synthèse", "pour le conseil des maîtres, la restitution aux familles et la transmission à l’IEN.")
-puce(pdf, "La consolidation de plusieurs tablettes", "les réponses de 10 tablettes se réunissent en un seul ensemble, avec contrôle du nombre de tablettes fusionnées.")
+pdf.set_y(max(y1, y0 + 41) + 2)
 
-encadre(pdf, "Ce que l’application ne fait pas",
-        ["Elle n’envoie rien sur Internet : les réponses restent dans la tablette qui les a reçues, et la "
-         "consolidation se fait par export de fichier. C’est un choix assumé pour cette année scolaire.",
-         "Elle ne remplace aucun acte professionnel : l’entretien avec l’élève, l’information des familles et "
-         "le signalement relèvent des adultes, pas de l’outil.",
-         "Elle ne modifie pas la grille : les questions sont reproduites à l’identique (voir page 2)."],
+encadre(pdf, "Ce que fait l’application — et ce qu’elle ne fait pas",
+        ["Elle ne modifie pas le protocole : la grille est remplie sur papier, en classe, comme le prévoit "
+         "le guide de passation. L’application intervient après, pour l’exploitation.",
+         "Elle ne modifie pas la grille : les 24 questions et les 9 questions de contexte sont recopiées à "
+         "l’identique, et le calcul suit la table officielle (page 6).",
+         "Elle ne remplace aucun acte professionnel : l’entretien avec l’élève, l’information des familles "
+         "et le signalement relèvent des adultes.",
+         "Elle n’envoie rien sur Internet : chaque poste garde ses données, et la consolidation se fait par "
+         "export de fichier."],
         bg=IND_L, bord=(199, 210, 254), tc=IND)
+
+pdf.set_y(pdf.get_y() + 3)
+pdf.set_font("D", "", 8.2)
+pdf.set_text_color(*GREY)
+pdf.set_x(LM)
+pdf.multi_cell(W, 4.5, "Qui fait quoi : le professeur fait passer la grille dans sa classe puis saisit ses "
+                      "élèves ; le directeur consolide les sept fichiers et produit le rapport ; l’IEN et le "
+                      "CPC reçoivent le rapport et la synthèse (pages 2 et 6 pour la vérification).", align="L")
 
 # ======================= PAGE 2 — LE CADRE OFFICIEL =======================
 pdf.add_page()
 h1(pdf, "Le cadre officiel", 18)
-para(pdf, "Cette page est destinée au directeur, au CPC et à l’IEN : elle situe l’outil par rapport aux "
-          "textes et vérifie qu’il ne s’en écarte pas.")
+para(pdf, "Cette page est destinée au directeur, au CPC et à l’IEN : elle situe la démarche par rapport aux "
+          "textes, et vérifie qu’elle ne s’en écarte pas.")
 
 h2(pdf, "Textes de référence")
 puce(pdf, "Grille d’auto-évaluation — version 2025", "questionnaire élève du CE2 au CM2, 24 questions "
      "graduées de 1 (jamais) à 4 (très souvent), complétées par 9 questions de contexte.")
 puce(pdf, "Guide de passation — octobre 2026", "année scolaire 2026-2027 : deux heures banalisées entre "
-     "le jeudi 5 novembre et le vendredi 11 décembre 2026 ; passation assurée par le professeur de la classe "
-     "dans le premier degré ; exploitation par le professeur puis partage avec le directeur.")
-puce(pdf, "Objectifs officiels", "détecter les situations de harcèlement, faciliter la prévention, mobiliser "
-     "l’ensemble de la communauté éducative.")
+     "le jeudi 5 novembre et le vendredi 11 décembre 2026 ; passation assurée par le professeur de la "
+     "classe dans le premier degré ; exploitation par le professeur, puis partage avec le directeur.")
+puce(pdf, "Objectifs officiels", "détecter les situations de harcèlement, faciliter la prévention, "
+     "mobiliser l’ensemble de la communauté éducative.")
 
-h2(pdf, "Fidélité de l’instrument")
-para(pdf, "C’est le point sur lequel un regard extérieur doit être rassurant, et il l’est :")
-puce(pdf, "Les 24 questions et les 9 questions de contexte sont reproduites mot pour mot", "aucune "
-     "reformulation ne se substitue au texte officiel.")
-puce(pdf, "Deux ajouts, tous deux placés sous le texte officiel", "une reformulation « En clair » en "
-     "français simple et une lecture à voix haute. Ils répondent à une difficulté locale de lecture et à la "
-     "présence d’élèves allophones, sans changer le nombre d’items, leur ordre, l’échelle de réponse ni la "
-     "règle de comptage.")
-puce(pdf, "Le calcul est celui de la grille", "totaux A, B et C, puis croisement A × (B+C) dans la table "
-     "officielle reproduite page 5.")
+h2(pdf, "Ce qui reste inchangé, et ce qui est ajouté")
+puce(pdf, "Inchangé : la passation", "les élèves remplissent la grille papier en classe, sous la "
+     "responsabilité de leur professeur, pendant les deux heures banalisées. Rien n’est dématérialisé.")
+puce(pdf, "Inchangé : l’instrument", "mêmes questions, même ordre, mêmes modalités de réponse, même règle "
+     "de comptage, même table de croisement.")
+puce(pdf, "Ajouté : l’exploitation", "la recopie des réponses dans un outil qui calcule et rédige "
+     "l’interprétation, afin que les résultats soient effectivement lus et exploités — ce qui faisait "
+     "défaut les années précédentes.")
+puce(pdf, "Ajouté : la traçabilité", "un état des lieux chiffré, comparable d’une classe à l’autre et "
+     "d’une année sur l’autre, mobilisable dans le dossier de labellisation.")
 
 h2(pdf, "Information des élèves et des familles")
 para(pdf, "Le guide prévoit que le professeur lise aux élèves la mention informative du questionnaire. "
-          "L’application l’affiche avant la première question : réponses non obligatoires, prénom non "
-          "demandé, lecture des réponses par les adultes de l’école pour aider les élèves qui en ont besoin.")
+          "Elle figure au dos de la grille : les réponses ne sont pas obligatoires, le prénom n’est pas "
+          "demandé, les adultes de l’école lisent les réponses pour aider les élèves qui en ont besoin.")
 para(pdf, "Destinataires, conformément à la grille : les adultes qui font passer le questionnaire, le "
-          "directeur, l’IEN, les adultes chargés de résoudre les situations, les personnes désignées par le "
-          "directeur, et les parents ou responsables légaux.")
+          "directeur, l’IEN, les adultes chargés de résoudre les situations, les personnes désignées par "
+          "le directeur, et les parents ou responsables légaux. La recopie dans l’application ne change "
+          "pas cette liste : elle est faite par le professeur, pour son propre usage et celui de la "
+          "direction.")
 
 h2(pdf, "Conservation des données")
-puce(pdf, "Questionnaires", "conservés jusqu’à la fin de l’année scolaire, puis détruits dans des "
-     "conditions ne permettant pas leur réutilisation.")
-puce(pdf, "Questionnaires nominatifs révélant une situation de harcèlement", "conservés trois ans au "
-     "maximum, dans des conditions garantissant leur confidentialité, le temps de la résolution.")
+puce(pdf, "Grilles papier", "la pièce de référence. Conservées jusqu’à la fin de l’année scolaire, puis "
+     "détruites dans des conditions ne permettant pas leur réutilisation.")
+puce(pdf, "Grilles nominatives révélant une situation de harcèlement", "conservées trois ans au maximum, "
+     "dans des conditions garantissant leur confidentialité, le temps de la résolution.")
 puce(pdf, "Fichiers numériques", "la sauvegarde exportée contient les réponses et, le cas échéant, les "
-     "prénoms : elle est conservée par le directeur dans les mêmes conditions, sur un support maîtrisé par "
-     "l’école. L’export CSV, lui, ne contient aucun prénom.")
+     "prénoms : conservée par le directeur dans les mêmes conditions, sur un support maîtrisé par l’école. "
+     "L’export CSV ne contient aucun prénom.")
 
 encadre(pdf, "Point de vigilance pour la circonscription",
-        ["L’outil n’étant adossé à aucun serveur, il n’existe pas de base de données académique : ce sont les "
-         "fichiers exportés par l’école qui constituent la trace. Il convient donc de désigner un adulte "
-         "responsable de la conservation, et de détruire les fichiers à l’échéance prévue."],
+        ["L’outil n’est adossé à aucun serveur : il n’existe pas de base de données académique, et ce sont "
+         "les fichiers exportés par l’école qui constituent la trace. Il convient donc de désigner un "
+         "adulte responsable de leur conservation, et de les détruire à l’échéance prévue."],
         bg=(255, 251, 235), bord=(253, 230, 138), tc=ORANGE)
 
-# ====================== PAGE 3 — AVANT LA PASSATION ======================
+# ====================== PAGE 3 — AVANT LA CAMPAGNE ======================
 pdf.add_page()
-h1(pdf, "Avant la passation : préparer les tablettes", 18)
-para(pdf, "Le cas visé ici est celui d’une école de 7 classes (2 CE2, 3 CM1, 1 CM2, 1 CM1-CM2) qui "
-          "utilise une dizaine de tablettes circulant entre les classes.")
+h1(pdf, "Avant la campagne : organiser", 18)
+para(pdf, "Le cas visé : une école de 7 classes (2 CE2, 3 CM1, 1 CM2, 1 CM1-CM2). Chaque enseignant "
+          "saisit sa propre classe, sur son propre poste.")
 
-h2(pdf, "1. Installer l’application sur chaque tablette", avant=2)
-num(pdf, 1, "Ouvrir le lien", ["Scanner le QR code de la page 1, ou taper l’adresse. L’application "
-                               "fonctionne ensuite hors connexion."])
-num(pdf, 2, "Ajouter à l’écran d’accueil", ["Menu de Chrome (trois points) → « Ajouter à l’écran "
-                                           "d’accueil ». L’icône apparaît avec les autres applications."])
-num(pdf, 3, "Vérifier la version", ["Sur l’écran d’accueil de l’application, en bas : la version doit être "
-                                    "« " + VERSION + " ». Si un autre numéro s’affiche, fermer complètement "
-                                    "l’application et la rouvrir ; au besoin, supprimer l’icône et la recréer."])
-num(pdf, 4, "Vérifier le son", ["Le bouton « Écouter la question » doit être audible. Régler le volume "
-                                "avant la séance, pas pendant."])
+h2(pdf, "1. Imprimer les grilles", avant=2)
+para(pdf, "Autant d’exemplaires que d’élèves, à partir du PDF officiel de la grille 2025 (une page "
+          "recto-verso : les 24 questions au recto, les 9 questions de contexte et l’encadré de "
+          "l’enseignant au verso). Prévoir quelques exemplaires supplémentaires pour les élèves absents "
+          "qui reviendront plus tard dans la période.")
 
-h2(pdf, "2. Vérifier que les classes sont les bonnes")
-para(pdf, "Les sept classes de l’école sont pré-remplies dans l’application : CE2 A, CE2 B, CM1 A, "
-          "CM1 B, CM1 C, CM2, CM1/CM2. Aucun réglage n’est nécessaire. Si l’organisation de l’école "
-          "change, la liste se modifie dans Espace adulte → Réglages → Classes et effectifs — et cette "
-          "modification doit être faite de la même façon sur toutes les tablettes, sinon les élèves ne "
-          "choisiront pas la même classe.")
+h2(pdf, "2. Répartir les rôles")
+puce(pdf, "Chaque professeur", "fait passer la grille dans sa classe, ramasse les copies, puis saisit "
+     "les résultats de sa classe dans l’application.")
+puce(pdf, "Le directeur", "tient la fiche de suivi (dernière page), rappelle l’échéance, et consolide "
+     "les saisies sur le poste de référence.")
+puce(pdf, "Le poste de référence", "un ordinateur de l’école qui ne sert pas à la saisie : c’est lui qui "
+     "réunira les sept fichiers, calculera les résultats de l’école et produira le rapport.")
 
-h2(pdf, "3. Étiqueter et suivre les tablettes")
-puce(pdf, "Numéroter les tablettes de 1 à 10", "une gommette suffit. Le numéro sert au renommage des "
-     "fichiers exportés et au contrôle final.")
-puce(pdf, "Utiliser la fiche de suivi (dernière page)", "une ligne par tablette : classe passée, date, "
-     "export fait, import fait. C’est ce document qui garantit qu’aucune tablette n’est oubliée.")
-puce(pdf, "Une tablette, une classe, une séance", "ce n’est pas une obligation technique — la classe est "
-     "enregistrée questionnaire par questionnaire — mais cela simplifie le contrôle.")
+h2(pdf, "3. Vérifier l’application sur chaque poste")
+puce(pdf, "Ouvrir le lien, puis « Ajouter à l’écran d’accueil »", "l’application fonctionne ensuite hors "
+     "connexion, ce qui évite les mauvaises surprises le jour de la saisie.")
+puce(pdf, "Vérifier la version", "en bas de l’écran d’accueil doit apparaître « " + VERSION + " ». Si un "
+     "autre numéro s’affiche, fermer complètement l’application et la rouvrir ; au besoin, supprimer "
+     "l’icône et la recréer depuis le lien.")
+puce(pdf, "Rien à configurer", "les sept classes de l’école sont déjà pré-remplies dans l’application. "
+     "Aucune liste à saisir, sur aucun poste.", color=VERT)
 
-h2(pdf, "4. Combien de tablettes par classe ?")
-para(pdf, "Un questionnaire demande 10 à 15 minutes (12 en moyenne). Une classe de 25 élèves représente "
-          "donc environ 5 heures sur une seule tablette : pour tenir dans les deux heures banalisées, il "
-          "faut 2 à 3 tablettes en parallèle. Avec 10 tablettes et 7 classes, la campagne s’étale "
-          "naturellement sur plusieurs jours entre le 5 novembre et le 11 décembre.")
-para(pdf, "Conseil d’organisation : privilégier des groupes de 8 à 10 élèves par tablette, plutôt qu’une "
-          "classe entière sur un seul appareil. Un élève qui attend répond mal.", color=GREY, size=8.9)
+h2(pdf, "4. Ce que représente le temps de saisie")
+para(pdf, "Un questionnaire se recopie en une minute environ au clavier (33 réponses à cocher). Pour une "
+          "classe de 25 élèves, compter 25 à 30 minutes, à faire au calme, une fois les grilles ramassées. "
+          "Ce temps n’a pas à être pris sur les deux heures banalisées de la passation : il peut être "
+          "fractionné sur plusieurs jours, tant que la saisie est terminée avant la fin de la période.")
 
-# ====================== PAGE 4 — PENDANT LA PASSATION ======================
-pdf.add_page()
-h1(pdf, "Pendant la séance, pas à pas", 18)
-para(pdf, "La séquence est assurée par le professeur de la classe. Compter une quinzaine de minutes de "
-          "consignes et de sensibilisation avant la première tablette.", color=GREY, size=8.9)
-pdf.ln(1)
-
-num(pdf, 1, "Expliquer avant de lancer", [
-    "Rappeler ce qu’est le harcèlement et le cyberharcèlement, que les réponses ne sont pas obligatoires, "
-    "que le prénom n’est pas demandé, que les adultes sont là pour aider. Lire la mention informative "
-    "affichée par l’application."])
-num(pdf, 2, "Chaque élève commence", [
-    "Bouton « Je réponds au questionnaire ». L’élève indique sa classe, fille ou garçon, son année de "
-    "naissance. Ces trois informations servent uniquement à ranger les réponses.",
-    "Une question par écran, toujours dans le même ordre. Le bouton « Écouter la question » la lit à voix "
-    "haute : à proposer sans compter, c’est ce qui rend le questionnaire accessible aux élèves qui lisent "
-    "difficilement et aux élèves allophones.",
-    "La ligne bleue « En clair » reformule la question en français simple, sous le texte officiel : la "
-    "question n’est jamais modifiée. L’élève peut revenir en arrière ou passer une question avec « Je "
-    "préfère ne pas répondre » — elle n’est alors comptée ni pour ni contre lui."])
-num(pdf, 3, "À la fin de chaque élève", [
-    "Écran de remerciement avec le numéro 3018. L’élève appuie sur « Élève suivant » : la tablette est "
-    "prête pour le camarade, sans rien réinitialiser. La page d’accueil indique le nombre de "
-    "questionnaires déjà enregistrés : c’est le compteur de contrôle de la séance."])
-num(pdf, 4, "Surveiller les réactions", [
-    "Un élève qui pleure, qui se bloque ou qui reste silencieux est déjà une information. Un adulte doit "
-    "être disponible pour l’écouter tout de suite. Le guide prévoit que les personnels sociaux et de "
-    "santé, le RASED et le psychologue scolaire soient mobilisés à cette occasion."])
-
-y = pdf.get_y() + 1.5
-pdf.image(SH + "/shots/crop-question.png", x=LM, y=y, w=46)
-pdf.set_xy(LM + 52, y + 1)
-pdf.set_font("D", "B", 9.4)
-pdf.set_text_color(*IND)
-pdf.cell(0, 5, "L’écran de question")
-pdf.ln(6)
-pdf.set_x(LM + 52)
-pdf.set_font("D", "", 8.7)
-pdf.set_text_color(*INK)
-pdf.multi_cell(W - 52, 4.9,
-    "Les quatre réponses sont toujours dans le même ordre et de la même couleur : vert, jaune, orange, "
-    "rouge. Un élève se trompe rarement.", align="L")
-pdf.ln(2.2)
-pdf.set_x(LM + 52)
-pdf.multi_cell(W - 52, 4.9,
-    "Le prénom est proposé à la fin, une seule fois : un adulte viendra parler à l’élève si ses réponses "
-    "montrent qu’il souffre. Il peut rester anonyme.", align="L")
-
-pdf.set_y(max(pdf.get_y(), y + 62) + 3)
-encadre(pdf, "À dire aux élèves avant de ranger les tablettes",
-        ["La violence, sous toutes ses formes, est inacceptable à l’école comme en dehors. Une moquerie, "
-         "une insulte, un coup ne sont jamais « pour rire ».",
-         "Tous les adultes de l’école sont disponibles pour écouter, à tout moment de l’année, même si "
-         "l’élève n’a pas écrit son prénom. Les noms des adultes référents et des élèves ambassadeurs "
-         "peuvent être affichés.",
-         "3018 : numéro gratuit, anonyme et confidentiel, 7 jours sur 7 de 9 h à 23 h."],
+encadre(pdf, "Ordre de grandeur pour l’école",
+        ["7 classes × 25 élèves = environ 175 questionnaires, soit 175 minutes de saisie réparties entre "
+         "les sept enseignants : une demi-heure chacun.",
+         "C’est le point sur lequel il faut être vigilant : une classe non saisie fausse les résultats de "
+         "l’école, et rien ne le signale — d’où la fiche de suivi."],
         bg=(240, 253, 244), bord=(187, 247, 208), tc=VERT)
 
-# ======================= PAGE 5 — LIRE LES RÉSULTATS =======================
+# ===================== PAGE 4 — LA PASSATION EN CLASSE =====================
 pdf.add_page()
-h1(pdf, "Après la séance : lire les résultats", 18)
-para(pdf, "Espace adulte → code 2026 (modifiable dans Réglages). L’onglet « Vue d’ensemble » donne les "
-          "chiffres et l’interprétation ; l’onglet « Rapport » produit le document à imprimer.")
-pdf.ln(1.5)
+h1(pdf, "La passation en classe, sur papier", 18)
+para(pdf, "Cette page reprend les obligations du guide de passation. Elle est à lire avant la séance.",
+          color=GREY, size=8.9)
+pdf.ln(1)
+
+num(pdf, 1, "Expliquer avant de distribuer", [
+    "Rappeler ce qu’est le harcèlement et le cyberharcèlement, et ce que l’école en fait. Des ressources "
+    "sont disponibles sur éduscol et sur la plateforme Phare.",
+    "Préciser que les réponses ne sont pas obligatoires, que le prénom n’est pas demandé, et que les "
+    "adultes de l’école lisent les réponses pour aider les élèves qui en ont besoin. Lire la mention "
+    "informative figurant au dos de la grille."])
+num(pdf, 2, "Distribuer et accompagner", [
+    "Expliquer les quatre modalités de réponse : Jamais, Parfois, Souvent, Très souvent, en tenant compte "
+    "de ce qui s’est passé depuis le début de l’année scolaire.",
+    "Les élèves prennent le temps qu’ils souhaitent. Mettre en confiance, rassurer sur la confidentialité, "
+    "encourager la sincérité.",
+    "Les élèves à besoins éducatifs particuliers (Ulis, UPE2A) peuvent disposer d’un temps et d’un "
+    "accompagnement spécifiques, avec un travail préalable sur le sens des questions."])
+num(pdf, 3, "Ramasser et écouter", [
+    "Les grilles sont ramassées par le professeur de la classe.",
+    "La passation peut entraîner une libération de la parole. Un élève qui pleure, qui se bloque ou qui "
+    "reste silencieux doit pouvoir parler à un adulte tout de suite : personnels sociaux et de santé, "
+    "RASED, psychologue scolaire sont mobilisés à cette occasion."])
+num(pdf, 4, "Avant la fin de la séance, redire", [
+    "La violence, sous toutes ses formes, est inacceptable à l’école comme en dehors : une moquerie, une "
+    "insulte, un coup ne sont jamais « pour rire ».",
+    "Tous les adultes de l’école sont disponibles pour écouter, à tout moment de l’année, même si l’élève "
+    "n’a pas écrit son prénom. Les noms des adultes référents et des élèves ambassadeurs peuvent être "
+    "affichés.",
+    "3018 : numéro gratuit, anonyme et confidentiel, 7 jours sur 7 de 9 h à 23 h."])
+
+encadre(pdf, "L’alternative tablette, pour un élève isolé",
+        ["L’application propose aussi le questionnaire directement à l’écran : « Répondre au questionnaire "
+         "(élève) ».",
+         "C’est utile pour un élève absent le jour de la passation, ou pour un petit groupe qui ne peut pas "
+         "attendre. Les questions y sont les mêmes, avec en plus une lecture à voix haute et une "
+         "reformulation en français simple — un appui pour les élèves en difficulté de lecture.",
+         "Ce mode reste marginal : la méthode retenue pour l’école est le papier."],
+        bg=IND_L, bord=(199, 210, 254), tc=IND)
+
+# ==================== PAGE 5 — LA SAISIE PAR L'ENSEIGNANT ====================
+pdf.add_page()
+h1(pdf, "La saisie par l’enseignant", 18)
+para(pdf, "C’est l’étape nouvelle. Elle se fait au calme, une fois les grilles ramassées.")
+
+num(pdf, 1, "Ouvrir la saisie et choisir sa classe", [
+    "Bouton « Saisir les réponses (enseignant) », puis la classe. Elle est mémorisée pour toute la "
+    "série : inutile de la choisir à chaque élève."])
+num(pdf, 2, "Recopier un questionnaire par écran", [
+    "24 lignes de questions, puis 9 lignes oui/non, dans le même ordre que la grille papier : on lit la "
+    "copie ligne par ligne et on coche en face.",
+    "Fille / garçon, année de naissance et prénom sont facultatifs. Le prénom, s’il est saisi, permet au "
+    "directeur de retrouver nominativement l’élève dans la liste « Élèves à recevoir »."])
+num(pdf, 3, "Utiliser le clavier, pas la souris", [
+    "Les touches 1 à 4 remplissent la ligne surlignée et passent automatiquement à la suivante. Pour les "
+    "questions oui/non, 1 = oui et 2 = non. La touche Entrée enregistre le questionnaire, remet le "
+    "formulaire à zéro et conserve la classe : l’élève suivant est immédiat.",
+    "Une ligne laissée vide n’est pas comptée, comme sur le papier. Un questionnaire dont aucune réponse "
+    "n’est cochée n’est pas enregistré."])
+num(pdf, 4, "Se corriger", [
+    "« Annuler le dernier » supprime le questionnaire qui vient d’être enregistré pour cette classe : "
+    "c’est la réponse à une erreur de recopie. Les questionnaires déjà enregistrés ne peuvent pas être "
+    "modifiés un par un — mieux vaut vérifier la copie avant de valider la suivante."])
+
+y = pdf.get_y() + 1.5
+pdf.image(SH + "/shots/crop-saisie.png", x=LM, y=y, w=88)
+pdf.set_xy(LM + 94, y + 1)
+pdf.set_font("D", "B", 9.4)
+pdf.set_text_color(*IND)
+pdf.cell(0, 5, "L’écran de saisie")
+pdf.ln(6)
+pdf.set_x(LM + 94)
+pdf.set_font("D", "", 8.6)
+pdf.set_text_color(*INK)
+pdf.multi_cell(W - 94, 4.85,
+    "La ligne en cours est surlignée. Les réponses cochées prennent la couleur de la grille : vert, jaune, "
+    "orange, rouge.", align="L")
+pdf.ln(2.0)
+pdf.set_x(LM + 94)
+pdf.multi_cell(W - 94, 4.85,
+    "Le bandeau rappelle la classe et le nombre de questionnaires déjà recopiés : c’est le compteur à "
+    "comparer avec le nombre de copies ramassées.", align="L")
+pdf.ln(2.0)
+pdf.set_x(LM + 94)
+pdf.multi_cell(W - 94, 4.85,
+    "Une fois les copies saisies : onglet Données → « Sauvegarde complète (.json) ». Un fichier par "
+    "enseignant, à transmettre au directeur.", align="L")
+
+pdf.set_y(max(pdf.get_y(), y + 78) + 4)
+encadre(pdf, "Combien de temps ?",
+        ["Une minute environ par questionnaire : 33 réponses à cocher, sans changer de page.",
+         "25 à 30 minutes pour une classe de 25 élèves. Ce temps n’a pas à être pris sur les deux heures "
+         "banalisées de la passation : il peut être fractionné, tant que la saisie est terminée avant la "
+         "fin de la période."],
+        bg=(240, 253, 244), bord=(187, 247, 208), tc=VERT)
+
+# ======================= PAGE 6 — LIRE LES RÉSULTATS =======================
+pdf.add_page()
+h1(pdf, "Lire les résultats", 18)
+para(pdf, "Espace adulte → code 2026. L’onglet « Vue d’ensemble » donne les chiffres et l’interprétation ; "
+          "l’onglet « Rapport » produit le document à imprimer.")
 
 h2(pdf, "Comment sont calculés les scores", avant=1)
 pdf.set_draw_color(*LINE)
@@ -504,23 +572,11 @@ para(pdf, "L’application applique exactement cette table : les deux indices é
           "retenue comme du harcèlement ; un seul indice élevé, l’élève est « à surveiller ».")
 pdf.ln(1)
 tableau_croisement(pdf)
-pdf.ln(1.5)
+pdf.ln(1.2)
 para(pdf, "Lecture : un élève qui déclare 8 atteintes ou plus, quel que soit son niveau de mal-être, est "
           "en zone harcèlement. À l’inverse, un élève qui exprime un mal-être important (total A de 5 ou "
           "plus) sans atteinte déclarée est également en zone harcèlement : la souffrance installée fait "
           "présumer des faits que l’élève ne nomme pas.", size=8.9)
-
-h2(pdf, "Comment lire les chiffres")
-puce(pdf, "Le pourcentage compte des élèves, pas des faits", "12 % sur 33 élèves, cela fait 4 élèves. "
-     "Sur un petit effectif, un élève pèse 3 points : l’application affiche systématiquement cette prudence.")
-puce(pdf, "3 % et 13 % sont des repères, pas des objectifs", "ce sont les résultats nationaux de novembre "
-     "2025 pour les écoliers du CE2 au CM2. Être au-dessus ne signifie pas « école en échec » : cela "
-     "signifie que le travail à mener est identifié.", color=ORANGE)
-puce(pdf, "La part « à surveiller » décrit le climat", "quand elle est haute, le problème n’est pas "
-     "seulement individuel : il porte sur les relations dans l’école, donc sur les actions collectives.")
-puce(pdf, "Les faits graves ne relèvent pas de la prévention", "violence sexuelle, violences physiques, "
-     "cyberviolence : ils sont signalés nommément par l’application et appellent un signalement immédiat.",
-     color=ROUGE)
 
 encadre(pdf, "Exemple de lecture, de bout en bout",
         ["Un élève répond « souvent » aux questions 3, 7, 8 et « très souvent » à la question 2 : total A = 4. "
@@ -529,35 +585,44 @@ encadre(pdf, "Exemple de lecture, de bout en bout",
          "sont répétés, l’élève doit être revu et écouté, même sans harcèlement au sens de la grille."],
         bg=IND_L, bord=(199, 210, 254), tc=IND, size=8.4)
 
-# ==================== PAGE 6 — CONSOLIDER LES TABLETTES ====================
+h2(pdf, "Comment lire les chiffres", avant=1)
+puce(pdf, "Le pourcentage compte des élèves, pas des faits", "12 % sur 33 élèves, cela fait 4 élèves. "
+     "Sur un petit effectif, un élève pèse 3 points : l’application affiche systématiquement cette prudence.")
+puce(pdf, "3 % et 13 % sont des repères, pas des objectifs", "ce sont les résultats nationaux de novembre "
+     "2025 pour les écoliers du CE2 au CM2. Être au-dessus ne signifie pas « école en échec » : cela "
+     "signifie que le travail à mener est identifié.", color=ORANGE)
+puce(pdf, "Les faits graves ne relèvent pas de la prévention", "violence sexuelle, violences physiques, "
+     "cyberviolence : ils sont signalés nommément et appellent un signalement immédiat.", color=ROUGE)
+
+# ==================== PAGE 7 — CONSOLIDER LES SAISIES ====================
 pdf.add_page()
-h1(pdf, "Consolider les résultats des 10 tablettes", 18)
-para(pdf, "Chaque tablette conserve ses propres réponses : rien ne se synchronise automatiquement. "
-          "La consolidation se fait par fichiers, en trois temps.")
+h1(pdf, "Consolider les sept saisies", 18)
+para(pdf, "Chaque poste conserve ses propres données : rien ne se synchronise automatiquement. La "
+          "consolidation se fait par fichiers, en trois temps.")
 pdf.ln(1)
 
-num(pdf, 1, "Sur chaque tablette, à la fin de sa dernière séance", [
+num(pdf, 1, "Chaque enseignant exporte sa saisie", [
     "Espace adulte → onglet Données → « Sauvegarde complète (.json) ». Le fichier arrive dans les "
-    "téléchargements de la tablette.",
-    "Le renommer avec le numéro de la tablette (tablette-3.json) et cocher la case « export fait » sur "
-    "la fiche de suivi. C’est la seule sauvegarde : une tablette dont l’historique Chrome est vidé perd "
-    "tout, sans rattrapage."])
-num(pdf, 2, "Sur le PC de référence, qui n’a pas servi à la passation", [
-    "Ouvrir la même adresse dans Chrome, puis Espace adulte → Données → « Fusionner plusieurs tablettes » "
-    "et sélectionner les dix fichiers en une seule fois. Les doublons sont écartés automatiquement : on "
-    "peut réimporter sans risque.",
-    "L’onglet Données affiche alors « Tablettes enregistrées » : le nombre doit correspondre au nombre de "
-    "tablettes utilisées. S’il en manque une, c’est que son fichier n’a pas été importé — c’est le "
-    "contrôle à faire avant tout envoi."])
-num(pdf, 3, "Sur ce même PC, compléter et produire les documents", [
+    "téléchargements du poste.",
+    "Le renommer avec le nom de la classe (CM1-B.json) et le transmettre au directeur — par messagerie "
+    "ou sur une clé. C’est la seule sauvegarde : un poste dont l’historique Chrome est vidé perd tout, "
+    "sans rattrapage."])
+num(pdf, 2, "Le directeur fusionne sur le poste de référence", [
+    "Ouvrir la même adresse sur ce poste, puis Espace adulte → Données → « Fusionner plusieurs postes de "
+    "saisie » et sélectionner les sept fichiers en une seule fois. Les doublons sont écartés "
+    "automatiquement : on peut réimporter sans risque.",
+    "L’onglet Données affiche alors « Postes de saisie » : le nombre doit correspondre au nombre "
+    "d’enseignants. S’il en manque un, c’est que son fichier n’a pas été importé — c’est le contrôle à "
+    "faire avant tout envoi."])
+num(pdf, 3, "Compléter et produire les documents", [
     "Réglages → Classes et effectifs : renseigner les effectifs des sept classes. Eux seuls permettent de "
-    "calculer les taux de participation, par classe et par niveau. Inutile de le faire sur les tablettes.",
+    "calculer les taux de participation, par classe et par niveau.",
     "Rapport → « Imprimer / Enregistrer en PDF » pour le conseil des maîtres et la circonscription ; "
     "« Copier la synthèse » pour le courrier ou le message à l’IEN."])
 
 h2(pdf, "Ce que montre le tableau de bord")
 puce(pdf, "Vue d’ensemble", "les quatre indicateurs, la comparaison au baromètre national, "
-     "l’interprétation rédigée, les faits les plus déclarés, et le nombre de tablettes fusionnées.")
+     "l’interprétation rédigée, les faits les plus déclarés, et le nombre de postes fusionnés.")
 puce(pdf, "Par classe, puis par niveau", "les sept classes, et le regroupement CE2 / CM1 / CM2 / CM1-CM2.")
 puce(pdf, "Par question", "les 24 questions classées par fréquence : c’est ce qui désigne les thèmes de "
      "prévention à travailler en priorité.")
@@ -566,19 +631,18 @@ puce(pdf, "Élèves à recevoir", "les situations classées de la plus préoccup
      "l’analyse collective.")
 
 encadre(pdf, "À ne pas faire",
-        ["Vider l’historique ou les données de Chrome sur une tablette avant l’export.",
-         "Changer de tablette en cours de route sans exporter celle qu’on quitte.",
-         "Laisser un élève répondre deux fois : il compterait deux fois dans les statistiques.",
-         "Consolider sur une tablette qui a servi à la passation alors qu’un PC est disponible : la "
-         "confusion entre données locales et données fusionnées est alors inutile."],
+        ["Vider l’historique ou les données de Chrome sur un poste avant l’export.",
+         "Saisir deux fois la même copie : le questionnaire compterait deux fois dans les statistiques.",
+         "Oublier de saisir une classe : les résultats de l’école seraient faux, et rien ne le signalerait.",
+         "Consolider sur un poste qui a servi à la saisie alors que le poste de référence est disponible : "
+         "la confusion entre données locales et données fusionnées est alors inutile."],
         bg=(254, 242, 242), bord=(254, 202, 202), tc=ROUGE)
 
-# ================== PAGE 7 — PRISE EN CHARGE ET LABELLISATION ==================
+# ============== PAGE 8 — PRISE EN CHARGE, LABELLISATION, SUITE ==============
 pdf.add_page()
 h1(pdf, "Prise en charge et suite du dispositif", 18)
 
 h2(pdf, "Que faire des élèves repérés", avant=1)
-para(pdf, "C’est le point que le guide de passation impose, et celui que la circonscription regardera.")
 puce(pdf, "Questionnaire nominatif en situation de harcèlement", "entretien obligatoire avec l’élève, "
      "mesures conservatoires nécessaires, information de la famille, ouverture du protocole national de "
      "traitement des situations de harcèlement.")
@@ -603,8 +667,8 @@ rows2 = [
      "partagés en conseil des maîtres : un diagnostic local, pas une intention."),
     ("Axe 2 — Prévenir", "Des thèmes prioritaires désignés par les élèves eux-mêmes, donc des séances "
      "ciblées, et un indicateur pour mesurer leur effet."),
-    ("Axe 3 — Former", "Un protocole de passation commun à tous les collègues, réutilisable chaque année, "
-     "accessible aux élèves à besoins particuliers (lecture audio, français simple)."),
+    ("Axe 3 — Former", "Un protocole commun à tous les collègues, réutilisable chaque année : passation "
+     "identique, saisie identique, exploitation identique."),
     ("Axe 4 — Prendre en charge", "Les situations identifiées, nominatives ou non, avec la trace des "
      "élèves reçus et des faits graves signalés."),
 ]
@@ -624,16 +688,18 @@ for a, b in rows2:
     pdf.set_y(y + hb + 1.2)
 
 h2(pdf, "Calendrier proposé", avant=1.4)
-puce(pdf, "5 novembre – 11 décembre 2026", "passation dans les sept classes, sur les dix tablettes.")
-puce(pdf, "Décembre 2026", "consolidation sur le PC, conseil des maîtres, restitution aux familles.")
+puce(pdf, "5 novembre – 11 décembre 2026", "passation sur papier dans les sept classes, puis saisie par "
+     "chaque enseignant.")
+puce(pdf, "Décembre 2026", "consolidation sur le poste de référence, conseil des maîtres, restitution aux "
+     "familles.")
 puce(pdf, "Janvier – mai 2027", "actions de prévention ciblées sur les thèmes sortis en tête.")
-puce(pdf, "Juin 2027", "seconde passation avec la même application. La comparaison des deux mesures "
+puce(pdf, "Juin 2027", "seconde passation avec le même protocole. La comparaison des deux mesures "
      "constitue la preuve qu’un dispositif fonctionne : c’est ce que demandent les dossiers de "
      "labellisation, et ce qui manque le plus souvent.", color=VERT)
 
-h2(pdf, "Checklist avant transmission à la circonscription")
-for item in ["Les dix tablettes ont été exportées et la fiche de suivi est complète.",
-             "L’onglet Données affiche le nombre attendu de tablettes.",
+h2(pdf, "Checklist avant transmission à la circonscription", avant=1.4)
+for item in ["Les sept classes ont rendu leurs grilles et leur saisie.",
+             "L’onglet Données affiche sept postes de saisie.",
              "Les effectifs des sept classes sont renseignés (taux de participation).",
              "L’onglet « Élèves à recevoir » a été examiné et les entretiens sont programmés.",
              "Les faits graves ont été signalés à la direction.",
@@ -648,7 +714,7 @@ for item in ["Les dix tablettes ont été exportées et la fiche de suivi est co
     pdf.multi_cell(W - 7, 4.85, item, align="L")
     pdf.ln(0.2)
 
-# ========================= PAGE 8 — FICHE DE SUIVI =========================
+# ========================= PAGE 9 — FICHE DE SUIVI =========================
 fiche_suivi(pdf)
 
 out = "/workspace/nah/mode-emploi-non-au-harcelement.pdf"
