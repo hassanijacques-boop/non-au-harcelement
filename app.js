@@ -3,7 +3,7 @@
    Grille officielle 2025 (CE2-CM2) — passation sur tablette + interprétation
    Tout est local : aucune donnée ne quitte l’appareil.
    ========================================================================= */
-var VERSION = '20261027-2';
+var VERSION = '20261027-3';
 
 /* ------------------------------- DONNÉES -------------------------------- */
 /* d : total auquel la question appartient (A, B, C) — null = non comptée.
@@ -987,7 +987,6 @@ function tabClasses() {
   }
   t += '<tr class="tot"><td>École</td><td class="num">' + (a.effectif || '—') + '</td><td class="num">' + tt + '</td><td class="num">' + th + '</td><td class="num">' + ts + '</td><td class="num">' + tr + '</td></tr>';
   t += '</tbody></table></div>';
-  t += '<p class="tiny muted" style="margin-top:10px">Renseignez les effectifs dans l’onglet Réglages pour obtenir les taux de participation.</p>';
   if (a.incomplets) t += '<p class="small muted">' + a.incomplets + ' questionnaire(s) commencé(s) mais non terminé(s) — non comptés.</p>';
 
   if (a.parNiveau.length) {
@@ -1004,6 +1003,7 @@ function tabClasses() {
     t += '</tbody></table></div>';
     t += '<p class="tiny muted" style="margin-top:8px">Le niveau est déduit du nom de la classe : une classe à cours multiple apparaît sous son niveau réel, par exemple « CM1/CM2 ».</p>';
   }
+  t += '<p class="tiny muted" style="margin-top:12px">Renseignez les effectifs dans l’onglet Réglages pour obtenir les taux de participation.</p>';
 
   t += '</div>';
   return t;
@@ -1166,7 +1166,9 @@ function tabDonnees() {
   var t = '<div class="warn"><b>Sauvegardez après chaque séance.</b> Les réponses sont stockées dans la mémoire du navigateur de cet appareil. Si quelqu’un vide l’historique de Chrome, tout est perdu. Un export = un fichier que vous gardez.</div>';
 
   t += '<div class="card"><h2>Exporter</h2>';
-  t += '<p class="small">' + a.n + ' questionnaire(s) enregistré(s) sur cet appareil.</p>';
+  t += '<p class="small">' + a.n + ' questionnaire(s) ' + (a.appareils > 1
+        ? 'au total, issus de ' + a.appareils + ' tablettes fusionnées.'
+        : 'enregistré(s) sur cet appareil.') + '</p>';
   t += '<div style="display:grid;gap:9px">';
   t += '<button class="btn" onclick="exportJSON()">\uD83D\uDCBE Sauvegarde complète (.json)</button>';
   t += '<p class="tiny muted" style="margin:-2px 0 6px 2px">À garder et à réutiliser pour fusionner plusieurs tablettes.</p>';
