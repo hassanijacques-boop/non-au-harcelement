@@ -37,7 +37,7 @@ with sync_playwright() as pw:
     verif("Table A x (B+C) conforme à la grille officielle (180 combinaisons)", len(mauvais) == 0, mauvais[:5])
 
     # ---------- 2. PARCOURS ÉLÈVE COMPLET, AU CLIC ----------
-    p.click("text=Je réponds au questionnaire")
+    p.click("text=Répondre au questionnaire (élève)")
     verif("Écran identité", "Avant de commencer" in p.inner_text("#app"))
     chips = p.locator(".chips .chip").all_inner_texts()
     verif("7 classes pré-remplies", len([c for c in chips if "CM" in c or "CE" in c]) == 7, chips)
@@ -90,8 +90,61 @@ with sync_playwright() as pw:
     verif("BC = 14", r["s"]["BC"] == 14, r["s"])
     verif("Statut harcèlement", r["s"]["statut"] == "harc", r["s"]["statut"])
 
-    # ---------- 3. ESPACE ADULTE : PIN ----------
+    # ---------- 2 bis. SAISIE PAPIER PAR L’ENSEIGNANT ----------
     p.click("text=Élève suivant")
+    p.click("text=Saisir les réponses (enseignant)")
+    p.wait_for_timeout(250)
+    verif("Écran choix de classe (saisie)", "Saisie des questionnaires" in p.inner_text("#app"))
+    p.click(".chips .chip:text-is('CM1 B')")
+    p.wait_for_timeout(250)
+    t = p.inner_text("#app")
+    verif("Classe affichée en tête de saisie", "CM1 B" in t)
+    verif("33 lignes de saisie (24 questions + 9 oui/non)", p.locator(".srow").count() == 33, p.locator(".srow").count())
+    p.screenshot(path=SH + "/14-saisie.png", full_page=True)
+
+    # 24 fois la touche 3, puis 9 fois la touche 1 (oui)
+    for i in range(24):
+        p.keyboard.press("3")
+    for i in range(9):
+        p.keyboard.press("1")
+    etat = p.evaluate("() => ({q: sais.q.slice(), plus: JSON.parse(JSON.stringify(sais.plus)), i: sais.i})")
+    verif("Clavier : les 24 réponses enregistrées", etat["q"] == [3] * 24, etat["q"])
+    verif("Clavier : les 9 oui/non renseignés", len(etat["plus"]) == 9 and all(v == "oui" for v in etat["plus"].values()), etat["plus"])
+
+    n0 = p.evaluate("() => DB.rep.length")
+    p.keyboard.press("Enter")
+    p.wait_for_timeout(400)
+    n1 = p.evaluate("() => DB.rep.length")
+    verif("Entrée enregistre le questionnaire", n1 == n0 + 1, (n0, n1))
+    d = p.evaluate("""() => { const r = DB.rep[DB.rep.length-1]; const s = calc(r);
+        return {classe: r.classe, src: r.source, s: s, np: Object.keys(r.plus).length}; }""")
+    verif("Classe mémorisée pour toute la série", d["classe"] == "CM1 B", d)
+    verif("Saisie marquée comme venant du papier", d["src"] == "papier", d["src"])
+    verif("Score A=7 B=10 C=4 BC=14", (d["s"]["A"], d["s"]["B"], d["s"]["C"], d["s"]["BC"]) == (7, 10, 4, 14), d["s"])
+    verif("Faits graves détectés à la saisie", len(d["s"]["graves"]) == 4, d["s"]["graves"])
+    verif("Formulaire réinitialisé après enregistrement",
+          p.locator(".sbn.sel1, .sbn.sel2, .sbn.sel3, .sbn.sel4, .sbn.selo").count() == 0,
+          p.locator(".sbn.sel1, .sbn.sel2, .sbn.sel3, .sbn.sel4, .sbn.selo").count())
+    verif("Classe conservée pour l’élève suivant", "CM1 B" in p.inner_text("#app"))
+
+    # saisie à la souris (un clic sur un bouton)
+    p.locator(".srow").first.locator(".sbn").nth(3).click()
+    p.wait_for_timeout(150)
+    verif("Saisie à la souris : case 4 cochée",
+          p.evaluate("() => sais.q[0]") == 4, p.evaluate("() => sais.q[0]"))
+    # annulation d'une saisie erronée (la boîte de confirmation est acceptée)
+    n_av = p.evaluate("() => DB.rep.length")
+    p.once("dialog", lambda d: d.accept())
+    p.click("text=Annuler le dernier")
+    p.wait_for_timeout(350)
+    verif("Annulation du dernier questionnaire saisi",
+          p.evaluate("() => DB.rep.length") == n_av - 1,
+          (n_av, p.evaluate("() => DB.rep.length")))
+
+    p.click("text=Terminer")
+    p.wait_for_timeout(200)
+
+    # ---------- 3. ESPACE ADULTE : PIN ----------
     p.click("text=Espace adulte (résultats)")
     verif("Écran code", "Espace adulte" in p.inner_text("#app"))
     for c in ["1", "2", "3", "4"]:
@@ -200,8 +253,8 @@ with sync_playwright() as pw:
     p.wait_for_timeout(200)
     verif("Boutons export présents", "Sauvegarde complète" in p.inner_text("#app"))
     td = p.inner_text("#app")
-    verif("Liste des tablettes affichée", "Tablettes enregistrées" in td)
-    verif("3 tablettes listées", "3 tablette(s)" in td, td[-300:])
+    verif("Liste des postes affichée", "Postes de saisie" in td)
+    verif("3 postes listés", "3 poste(s)" in td, td[-300:])
     with p.expect_download() as dl:
         p.click("text=Sauvegarde complète")
     d = dl.value
@@ -245,7 +298,7 @@ with sync_playwright() as pw:
     e2 = []
     p2.on("pageerror", lambda e: e2.append(str(e)))
     p2.goto(URL, wait_until="networkidle")
-    p2.click("text=Je réponds au questionnaire")
+    p2.click("text=Répondre au questionnaire (élève)")
     p2.click(".chips .chip:text-is('CM2')")
     p2.click("text=Un garçon")
     p2.click("text=2016")

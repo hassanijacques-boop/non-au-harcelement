@@ -201,6 +201,46 @@ tr.tot td{font-weight:800;background:#f8fafc;border-top:2px solid #e2e8f0}
 .dots i{width:15px;height:15px;border-radius:50%;background:#dbe2ee;display:block}
 .dots i.on{background:#4338ca}
 
+/* ---------- SAISIE ENSEIGNANT ---------- */
+.sais{background:#fff;border-radius:14px;border:1px solid #e8ecf5;box-shadow:0 4px 18px rgba(15,23,42,.06);overflow:hidden}
+.shead{padding:11px 14px;background:linear-gradient(180deg,#eef2ff,#e7edff);border-bottom:1px solid #dbe3f5}
+.shead .t{font-weight:900;font-size:1rem;color:#312e81}
+.shead .s{font-size:.79rem;color:#4b5563;margin-top:1px}
+.sid{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid #eef1f7;align-items:center}
+.sx{min-height:36px;padding:4px 12px;border-radius:9px;border:2px solid #dde3ee;background:#fff;
+  font-family:inherit;font-weight:700;font-size:.82rem;cursor:pointer;color:#475569}
+.sx.on{background:#eef2ff;border-color:#4338ca;color:#3730a3}
+.sid select{min-height:36px;border:2px solid #dde3ee;border-radius:9px;font-family:inherit;
+  font-size:.82rem;padding:4px 8px;color:#1e293b;background:#fff;flex:0 1 132px}
+.sid input{min-height:36px;border:2px solid #dde3ee;border-radius:9px;font-family:inherit;
+  font-size:.82rem;padding:4px 8px;color:#1e293b;background:#fff;flex:1 1 150px;min-width:110px}
+.srow{display:grid;grid-template-columns:28px 1fr 152px;gap:8px;align-items:center;
+  padding:3px 12px;border-bottom:1px solid #f1f4f9}
+.srow.cur{background:#eef2ff;box-shadow:inset 3px 0 0 #4338ca}
+.srow .sn{font-size:.7rem;font-weight:900;color:#94a3b8;text-align:right}
+.srow .st{font-size:.85rem;color:#1e293b;line-height:1.2;padding:4px 0}
+.srow .sv{display:flex;gap:5px;justify-content:flex-end}
+.sbn{width:31px;height:31px;border-radius:7px;border:2px solid #dde3ee;background:#fff;font-family:inherit;
+  font-weight:900;font-size:.78rem;color:#94a3b8;cursor:pointer;transition:.1s}
+.sbn.w{width:auto;padding:0 9px;font-size:.76rem}
+.sbn.sel1{background:#dcfce7;border-color:#22c55e;color:#15803d}
+.sbn.sel2{background:#fef9c3;border-color:#eab308;color:#a16207}
+.sbn.sel3{background:#ffedd5;border-color:#f97316;color:#c2410c}
+.sbn.sel4{background:#fee2e2;border-color:#ef4444;color:#b91c1c}
+.sbn.selo{background:#dbeafe;border-color:#3b82f6;color:#1d4ed8}
+.sbar{position:sticky;bottom:0;background:#fff;border-top:2px solid #dde3ee;padding:9px 12px;
+  display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,24px);background:#0f172a;color:#fff;
+  padding:11px 18px;border-radius:12px;font-size:.88rem;font-weight:700;opacity:0;pointer-events:none;
+  transition:.25s;z-index:99;max-width:92vw;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media (max-width:560px){
+  .srow{grid-template-columns:24px 1fr 122px;padding:3px 8px}
+  .sbn{width:27px;height:27px;font-size:.72rem}
+  .sbn.w{padding:0 6px;font-size:.7rem}
+  .srow .st{font-size:.78rem}
+}
+
 @media (min-width:760px){.tabs{flex-wrap:wrap;overflow:visible}}
 
 /* ---------- IMPRESSION ---------- */

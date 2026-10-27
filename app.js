@@ -3,7 +3,7 @@
    Grille officielle 2025 (CE2-CM2) — passation sur tablette + interprétation
    Tout est local : aucune donnée ne quitte l’appareil.
    ========================================================================= */
-var VERSION = '20261027-4';
+var VERSION = '20261027-5';
 
 /* ------------------------------- DONNÉES -------------------------------- */
 /* d : total auquel la question appartient (A, B, C) — null = non comptée.
@@ -580,6 +580,8 @@ function dessiner() {
   else if (vue === 'plus') h = vPlus();
   else if (vue === 'prenom') h = vPrenom();
   else if (vue === 'merci') h = vMerci();
+  else if (vue === 'saisieClasse') h = vSaisieClasse();
+  else if (vue === 'saisie') h = vSaisie();
   else if (vue === 'pin') h = vPin();
   else if (vue === 'adulte') h = vAdulte();
   else if (vue === 'aide') h = vAide();
@@ -606,9 +608,10 @@ function vAccueil() {
   t += '<div><span class="pill">Enquête 2026 — 2027</span></div>';
   t += '<h1>Non au harcèlement</h1>';
   t += '<p class="sub">' + esc(DB.cfg.nom || 'Mon école') + '</p>';
-  t += '<button class="btn" onclick="commencer()">\uD83D\uDCDD Je réponds au questionnaire</button>';
+  t += '<button class="btn" onclick="ouvrirSaisie()">\uD83D\uDCC4 Saisir les réponses (enseignant)</button>';
+  t += '<button class="btn gris" onclick="commencer()">\uD83D\uDCDD Répondre au questionnaire (élève)</button>';
   t += '<button class="btn gris" onclick="aller(\'pin\')">\uD83D\uDD12 Espace adulte (résultats)</button>';
-  t += '<button class="btn gris" onclick="aller(\'aide\')">\u2139\uFE0F Aide et déroulement</button>';
+  t += '<button class="btn gris" onclick="aller(\'aide\')">\u2139\uFE0F Aide</button>';
   t += '<p class="tiny muted" style="margin-top:10px">';
   if (a.n) t += a.n + ' questionnaire(s) déjà enregistré(s) sur cet appareil · ';
   t += 'tes réponses restent dans la tablette</p>';
@@ -619,21 +622,44 @@ function vAccueil() {
 
 function vAide() {
   var t = '<div class="wrap"><h1 style="margin-bottom:12px">Comment ça se passe</h1>';
-  t += '<div class="card"><h2>Pour l’élève</h2>';
-  t += '<p>Le questionnaire contient <b>24 questions</b> sur ce que tu vis à l’école depuis le début de l’année. Tu réponds par : <b>Jamais</b>, <b>Parfois</b>, <b>Souvent</b>, <b>Très souvent</b>.</p>';
-  t += '<p>Il y a ensuite <b>9 questions</b> avec « oui » ou « non », puis tu peux écrire ton prénom — <b>seulement si tu le souhaites</b>.</p>';
-  t += '<p>Le bouton <b>\uD83D\uDD0A Écouter</b> lit la question à voix haute. Tu peux l’utiliser autant de fois que tu veux.</p>';
+
+  t += '<div class="card"><h2>Deux façons de faire passer</h2>';
+  t += '<p><b>1. Sur papier, puis saisie par l’enseignant.</b> C’est la méthode retenue pour l’école : '
+     + 'les élèves remplissent la grille imprimée en classe, puis chaque enseignant recopie les résultats '
+     + 'de sa classe dans l’application. Un fichier par enseignant, fusionnés ensuite.</p>';
+  t += '<p><b>2. Directement sur tablette.</b> Chaque élève répond seul, une question par écran, avec la '
+     + 'lecture audio. Utile pour un petit groupe ou un élève absent le jour de la passation.</p>';
   t += '</div>';
+
+  t += '<div class="card"><h2>Saisir les réponses papier</h2>';
+  t += '<p>Bouton « Saisir les réponses (enseignant) », puis choisir sa classe : elle est mémorisée pour '
+     + 'toute la série, inutile de la ressaisir à chaque élève.</p>';
+  t += '<p>Chaque questionnaire tient sur un écran : 24 lignes de questions et 9 lignes oui/non, dans le '
+     + 'même ordre que la grille papier.</p>';
+  t += '<div class="info small"><b>Au clavier, c’est beaucoup plus rapide :</b> les touches <b>1</b> à '
+     + '<b>4</b> remplissent la ligne surlignée et passent à la suivante, <b>Entrée</b> enregistre et '
+     + 'prépare l’élève suivant. Un questionnaire se recopie en une minute environ.</div>';
+  t += '<p class="small muted">Une erreur ? « Annuler le dernier » supprime le questionnaire qui vient '
+     + 'd’être enregistré pour cette classe. Une ligne laissée vide n’est pas comptée.</p>';
+  t += '</div>';
+
   t += '<div class="card"><h2>Ce que deviennent les réponses</h2>';
-  t += '<p>Elles restent <b>dans la tablette</b>. Rien n’est envoyé sur Internet. Seuls les adultes de l’école les lisent, pour aider les élèves qui en ont besoin.</p>';
-  t += '<p>Tu n’es <b>pas obligé</b> de répondre. Tu peux passer une question avec « Je préfère ne pas répondre ».</p>';
+  t += '<p>Elles restent <b>dans l’appareil</b>. Rien n’est envoyé sur Internet, aucun compte n’est '
+     + 'nécessaire. Seuls les adultes de l’école les lisent, pour aider les élèves qui en ont besoin.</p>';
+  t += '<p class="small">À la fin de la campagne : exporter chaque poste de saisie (onglet Données), '
+     + 'puis fusionner les fichiers sur le poste de référence. L’onglet Données indique le nombre de '
+     + 'postes fusionnés : il doit correspondre au nombre d’enseignants.</p>';
   t += '</div>';
-  t += '<div class="card"><h2>Pour l’adulte qui fait passer</h2>';
-  t += '<p>1. Préparez les tablettes : ouvrez la page, vérifiez que le son est activé.</p>';
-  t += '<p>2. Chaque élève répond, puis appuie sur <b>« Élève suivant »</b> : la tablette est prête pour le suivant.</p>';
-  t += '<p>3. À la fin de la séance : <b>Espace adulte</b> → onglet <b>Données</b> → <b>Exporter</b>. C’est la sauvegarde, à faire à chaque fois.</p>';
-  t += '<p>4. Les résultats, l’interprétation et le rapport à imprimer sont dans <b>Espace adulte</b>.</p>';
+
+  t += '<div class="card"><h2>Pour l’élève qui répond sur tablette</h2>';
+  t += '<p>Le questionnaire contient 24 questions et 9 questions oui/non. Il choisit sa classe, puis '
+     + 'répond par <b>Jamais</b>, <b>Parfois</b>, <b>Souvent</b> ou <b>Très souvent</b>.</p>';
+  t += '<p>Le bouton <b>\uD83D\uDD0A Écouter</b> lit la question à voix haute, autant de fois que '
+     + 'nécessaire. La ligne bleue « En clair » la reformule simplement.</p>';
+  t += '<p class="small muted">Il n’est pas obligé de répondre, et il peut passer une question. Le prénom '
+     + 'n’est demandé qu’à la fin, et reste facultatif.</p>';
   t += '</div>';
+
   t += '<button class="btn gris" onclick="aller(\'accueil\')">\u2190 Retour</button></div>';
   return t;
 }
@@ -851,6 +877,219 @@ function vMerci() {
 
 function suivantEleve() { cur = null; aller('accueil'); }
 
+
+/* --------------------------- SAISIE ENSEIGNANT ---------------------------- */
+/* Les questionnaires sont remplis sur papier, puis recopiés ici par
+   l’enseignant. Classe choisie une fois, puis une ligne par question. */
+var sais = null;
+var toastT = null;
+
+function toast(msg) {
+  var d = document.getElementById('toast');
+  if (!d) {
+    d = document.createElement('div');
+    d.id = 'toast';
+    document.body.appendChild(d);
+  }
+  d.className = 'toast on';
+  d.textContent = msg;
+  clearTimeout(toastT);
+  toastT = setTimeout(function () { d.className = 'toast'; }, 2800);
+}
+
+function nbSaisisClasse() {
+  var n = 0;
+  for (var i = 0; i < DB.rep.length; i++) {
+    if (DB.rep[i].fini && DB.rep[i].classe === sais.classe) n++;
+  }
+  return n;
+}
+
+function ouvrirSaisie() {
+  var cs = classes(), i;
+  sais = { classe: '', sexe: '', annee: '', prenom: '', q: [], plus: {}, i: 0 };
+  for (i = 0; i < Q.length; i++) sais.q.push(0);
+  if (cs.length === 1) sais.classe = cs[0].n;
+  aller(sais.classe ? 'saisie' : 'saisieClasse');
+}
+
+function vSaisieClasse() {
+  var cs = classes();
+  var t = '<div class="wrap narrow kid">';
+  t += '<div class="card">';
+  t += '<h2 style="font-size:1.3rem">Saisie des questionnaires</h2>';
+  t += '<p class="small muted">Choisissez la classe dont vous recopiez les résultats. Elle restera '
+     + 'la même pour toute la série : inutile de la ressaisir à chaque élève.</p>';
+  t += '<div class="chips" style="margin-top:12px">';
+  for (var i = 0; i < cs.length; i++) {
+    t += '<button class="chip" onclick="choixClasseSaisie(' + i + ')">' + esc(cs[i].n) + '</button>';
+  }
+  t += '</div></div>';
+  t += '<button class="lnk" onclick="aller(\'accueil\')">\u2190 Retour</button></div>';
+  return t;
+}
+
+function choixClasseSaisie(i) { sais.classe = classes()[i].n; aller('saisie'); }
+
+function vSaisie() {
+  var a = analyse(), i, k;
+  var t = '<div class="wrap"><div class="sais">';
+
+  t += '<div class="shead"><div class="t">Saisie \u2014 ' + esc(sais.classe) + '</div>';
+  t += '<div class="s">' + nbSaisisClasse() + ' questionnaire(s) recopi\u00e9(s) pour cette classe \u00b7 '
+     + a.n + ' au total sur cet appareil</div></div>';
+
+  /* identité, tout est facultatif sauf la classe déjà fixée */
+  t += '<div class="sid">';
+  t += '<button class="sx' + (sais.sexe === 'fille' ? ' on' : '') + '" onclick="saisSexe(\'fille\')">Fille</button>';
+  t += '<button class="sx' + (sais.sexe === 'garcon' ? ' on' : '') + '" onclick="saisSexe(\'garcon\')">Gar\u00e7on</button>';
+  t += '<select id="sannee" onchange="saisAnnee(this.value)"><option value="">Ann\u00e9e Naiss.</option>';
+  for (i = 0; i < ANNEES.length; i++) {
+    t += '<option' + (sais.annee === ANNEES[i] ? ' selected' : '') + '>' + ANNEES[i] + '</option>';
+  }
+  t += '</select>';
+  t += '<input id="sprenom" placeholder="Pr\u00e9nom (facultatif)" autocomplete="off" value="' + esc(sais.prenom) + '">';
+  t += '</div>';
+
+  /* les 24 questions */
+  for (i = 0; i < Q.length; i++) {
+    t += '<div class="srow' + (sais.i === i ? ' cur' : '') + '" id="sr' + i + '">';
+    t += '<div class="sn">' + Q[i].n + '</div>';
+    t += '<div class="st">' + esc(Q[i].c) + '</div>';
+    t += '<div class="sv">';
+    for (k = 1; k <= 4; k++) {
+      t += '<button class="sbn' + (sais.q[i] === k ? ' sel' + k : '') + '" title="' + REP[k - 1] +
+           '" onclick="saisRep(' + i + ',' + k + ')">' + k + '</button>';
+    }
+    t += '</div></div>';
+  }
+
+  /* les 9 questions oui / non */
+  for (i = 0; i < PLUS.length; i++) {
+    var idx = Q.length + i;
+    var val = sais.plus[PLUS[i].k];
+    t += '<div class="srow' + (sais.i === idx ? ' cur' : '') + '" id="sr' + idx + '">';
+    t += '<div class="sn">' + (i + 1) + '</div>';
+    t += '<div class="st">' + esc(PLUS[i].t) + '</div>';
+    t += '<div class="sv">';
+    t += '<button class="sbn w' + (val === 'oui' ? ' selo' : '') + '" onclick="saisPlus(' + i + ',\'oui\')">Oui</button>';
+    t += '<button class="sbn w' + (val === 'non' ? ' selo' : '') + '" onclick="saisPlus(' + i + ',\'non\')">Non</button>';
+    t += '</div></div>';
+  }
+
+  t += '<div class="sbar"><div class="tiny muted">Touches <b>1</b> \u00e0 <b>4</b> : remplir et passer \u00e0 la ligne suivante \u00b7 <b>Entr\u00e9e</b> : enregistrer</div>';
+  t += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  t += '<button class="btn mini gris" onclick="annulerDernier()">Annuler le dernier</button>';
+  t += '<button class="btn mini gris" onclick="aller(\'accueil\')">Terminer</button>';
+  t += '<button class="btn mini" onclick="enregistrerSaisie()">Enregistrer et continuer</button>';
+  t += '</div></div>';
+
+  t += '</div>';
+  t += '<p class="tiny muted" style="text-align:center;margin-top:10px">Les r\u00e9ponses vides restent non compt\u00e9es, comme sur le papier.</p>';
+  t += '</div>';
+  return t;
+}
+
+function saisSexe(v) { sais.sexe = v; dessiner(); }
+function saisAnnee(v) { sais.annee = v; }
+
+function majSaisRow(i) {
+  var row = document.getElementById('sr' + i);
+  if (!row) return;
+  var bs = row.querySelectorAll('.sbn');
+  if (i < Q.length) {
+    for (var k = 0; k < 4; k++) bs[k].className = 'sbn' + (sais.q[i] === k + 1 ? ' sel' + (k + 1) : '');
+  } else {
+    var v = sais.plus[PLUS[i - Q.length].k];
+    bs[0].className = 'sbn w' + (v === 'oui' ? ' selo' : '');
+    bs[1].className = 'sbn w' + (v === 'non' ? ' selo' : '');
+  }
+}
+
+function setCurSais(i) {
+  var old = document.getElementById('sr' + sais.i);
+  if (old) old.className = 'srow';
+  sais.i = i;
+  var row = document.getElementById('sr' + i);
+  if (!row) return;
+  row.className = 'srow cur';
+  if (row.scrollIntoView) row.scrollIntoView({ block: 'nearest' });
+}
+
+function saisRep(i, v) {
+  sais.q[i] = v;
+  majSaisRow(i);
+  setCurSais(Math.min(i + 1, Q.length + PLUS.length - 1));
+}
+function saisPlus(i, v) {
+  sais.plus[PLUS[i].k] = v;
+  majSaisRow(Q.length + i);
+  setCurSais(Math.min(Q.length + i + 1, Q.length + PLUS.length - 1));
+}
+
+function annulerDernier() {
+  for (var i = DB.rep.length - 1; i >= 0; i--) {
+    if (DB.rep[i].classe === sais.classe) {
+      if (!confirm('Supprimer le dernier questionnaire enregistr\u00e9 pour ' + sais.classe + ' ?\n\n'
+        + 'Les r\u00e9ponses de cet \u00e9l\u00e8ve seront perdues.')) return;
+      DB.rep.splice(i, 1);
+      sauver();
+      dessiner();
+      toast('Dernier questionnaire supprim\u00e9.');
+      return;
+    }
+  }
+  toast('Aucun questionnaire \u00e0 annuler pour cette classe.');
+}
+
+function enregistrerSaisie() {
+  var n = 0, i, k;
+  for (i = 0; i < Q.length; i++) if (sais.q[i]) n++;
+  if (!n) { toast('Aucune r\u00e9ponse coch\u00e9e : rien \u00e0 enregistrer.'); return; }
+  var pn = document.getElementById('sprenom');
+  var r = {
+    id: 'R' + Date.now() + Math.floor(Math.random() * 900 + 100),
+    dev: DB.cfg.dev || '',
+    ts: new Date().toISOString(),
+    classe: sais.classe, sexe: sais.sexe, annee: sais.annee,
+    prenom: pn ? String(pn.value).replace(/^\s+|\s+$/g, '').slice(0, 30) : '',
+    q: sais.q.slice(0), plus: {}, fini: true, source: 'papier'
+  };
+  for (k in sais.plus) r.plus[k] = sais.plus[k];
+  DB.rep.push(r);
+  sauver();
+  sais.q = [];
+  for (i = 0; i < Q.length; i++) sais.q.push(0);
+  sais.plus = {}; sais.prenom = ''; sais.sexe = ''; sais.annee = ''; sais.i = 0;
+  dessiner();
+  window.scrollTo(0, 0);
+  toast('Enregistr\u00e9 \u2014 ' + nbSaisisClasse() + ' questionnaire(s) pour ' + sais.classe);
+}
+
+document.addEventListener('keydown', function (e) {
+  if (vue !== 'saisie' || !sais) return;
+  var tag = (e.target && e.target.tagName) ? e.target.tagName.toUpperCase() : '';
+  if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+  var k = e.key;
+  if (k >= '1' && k <= '4') {
+    if (sais.i < Q.length) {
+      saisRep(sais.i, parseInt(k, 10));
+    } else if (k === '1' || k === '2') {
+      saisPlus(sais.i - Q.length, k === '1' ? 'oui' : 'non');
+    }
+    e.preventDefault();
+  } else if (k === 'ArrowDown') {
+    setCurSais(Math.min(sais.i + 1, Q.length + PLUS.length - 1));
+    e.preventDefault();
+  } else if (k === 'ArrowUp') {
+    setCurSais(Math.max(sais.i - 1, 0));
+    e.preventDefault();
+  } else if (k === 'Enter') {
+    enregistrerSaisie();
+    e.preventDefault();
+  }
+});
+
 /* ---------------------------------- PIN ----------------------------------- */
 function vPin() {
   var t = '<div class="wrap narrow" style="justify-content:center">';
@@ -941,8 +1180,8 @@ function tabVue() {
 
   t += '<p class="tiny muted" style="margin:-4px 0 12px 2px">' +
        (a.appareils > 1
-         ? '\uD83D\uDCF1 Résultats fusionnés de <b>' + a.appareils + ' tablettes</b> — vérifiez que c’est bien le nombre attendu.'
-         : '\uD83D\uDCF1 Réponses enregistrées sur cet appareil uniquement.') + '</p>';
+         ? '\uD83D\uDCF1 Résultats fusionnés de <b>' + a.appareils + ' postes de saisie</b> — vérifiez que c’est bien le nombre attendu.'
+         : '\uD83D\uDCF1 Réponses enregistrées sur cet appareil uniquement (aucune fusion).') + '</p>';
 
   // comparaison visuelle
   t += '<div class="card"><h2>Comparaison avec le baromètre national 2025</h2>';
@@ -1173,32 +1412,32 @@ function tabDonnees() {
 
   t += '<div class="card"><h2>Exporter</h2>';
   t += '<p class="small">' + a.n + ' questionnaire(s) ' + (a.appareils > 1
-        ? 'au total, issus de ' + a.appareils + ' tablettes fusionnées.'
-        : 'enregistré(s) sur cet appareil.') + '</p>';
+        ? 'au total, issus de ' + a.appareils + ' postes de saisie.'
+        : 'sur cet appareil.') + '</p>';
   t += '<div style="display:grid;gap:9px">';
   t += '<button class="btn" onclick="exportJSON()">\uD83D\uDCBE Sauvegarde complète (.json)</button>';
-  t += '<p class="tiny muted" style="margin:-2px 0 6px 2px">À garder et à réutiliser pour fusionner plusieurs tablettes.</p>';
+  t += '<p class="tiny muted" style="margin:-2px 0 6px 2px">À garder et à réutiliser pour fusionner plusieurs postes de saisie.</p>';
   t += '<button class="btn gris" onclick="exportCSV()">\uD83D\uDCCA Tableau anonyme (.csv)</button>';
   t += '<p class="tiny muted" style="margin:-2px 0 0 2px">Pour Excel ou LibreOffice. Sans prénom.</p>';
   t += '</div></div>';
 
   var ap = appareils(DB.rep);
-  t += '<div class="card"><h2>Tablettes enregistrées</h2>';
+  t += '<div class="card"><h2>Postes de saisie</h2>';
   if (!ap.length) {
     t += '<p class="small muted">Aucune réponse pour l’instant.</p></div>';
   } else {
-    t += '<div class="tbl"><table><thead><tr><th>Tablette</th><th class="num">Questionnaires</th></tr></thead><tbody>';
+    t += '<div class="tbl"><table><thead><tr><th>Poste</th><th class="num">Questionnaires</th></tr></thead><tbody>';
     for (var q = 0; q < ap.length; q++) {
       t += '<tr><td>' + (ap[q].id === 'origine' ? '<span class="muted">Avant le suivi</span>' : esc(ap[q].id)) +
            '</td><td class="num">' + ap[q].n + '</td></tr>';
     }
-    t += '<tr class="tot"><td>Total</td><td class="num">' + ap.length + ' tablette(s)</td></tr>';
+    t += '<tr class="tot"><td>Total</td><td class="num">' + ap.length + ' poste(s)</td></tr>';
     t += '</tbody></table></div>';
-    t += '<p class="tiny muted" style="margin-top:8px">Après fusion, cette liste doit contenir toutes les tablettes utilisées. S’il en manque une, importez son fichier .json ci-dessous.</p></div>';
+    t += '<p class="tiny muted" style="margin-top:8px">Après fusion, cette liste doit contenir tous les postes utilisés (un par enseignant en général). S’il en manque un, importez son fichier .json ci-dessous.</p></div>';
   }
 
-  t += '<div class="card"><h2>Fusionner plusieurs tablettes</h2>';
-  t += '<p class="small">Si la passation a été faite sur plusieurs tablettes, choisissez le fichier .json exporté depuis chaque tablette. Les doublons sont automatiquement écartés.</p>';
+  t += '<div class="card"><h2>Fusionner plusieurs postes de saisie</h2>';
+  t += '<p class="small">Si plusieurs enseignants ont saisi les résultats, choisissez le fichier .json exporté par chacun. Les doublons sont automatiquement écartés : on peut réimporter sans risque.</p>';
   t += '<input type="file" id="fj" accept=".json,application/json" multiple onchange="importer(this)" style="width:100%;padding:12px;border:2px dashed #c7d2fe;border-radius:12px;background:#f8faff">';
   t += '</div>';
 
