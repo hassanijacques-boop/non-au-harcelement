@@ -403,8 +403,8 @@ encadre(pdf, "Point de vigilance pour la circonscription",
 # ====================== PAGE 3 — AVANT LA CAMPAGNE ======================
 pdf.add_page()
 h1(pdf, "Avant la campagne : organiser", 18)
-para(pdf, "Le cas visé : sur les 17 classes de l’école, 7 passent le questionnaire (2 CE2, 1 CE2-CM1, "
-          "2 CM1, 1 CM1-CM2, 1 CM2). Les 10 classes de CP et de CE1 ont des activités adaptées le même jour, "
+para(pdf, "Le cas visé : sur les 18 classes de l’école, 7 passent le questionnaire (2 CE2, 1 CE2-CM1, "
+          "2 CM1, 1 CM1-CM2, 1 CM2). Les 11 classes de CP et de CE1 ont des activités adaptées le même jour, "
           "décrites dans le complément CP-CE1 : elles ne remplissent pas la grille. Chaque enseignant "
           "saisit sa propre classe, sur son propre poste.")
 

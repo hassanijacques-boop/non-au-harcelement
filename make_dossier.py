@@ -185,7 +185,7 @@ pdf.set_xy(LM, 68)
 pdf.set_font("D", "", 8.6)
 pdf.set_text_color(206, 210, 248)
 pdf.multi_cell(155, 5,
-    "17 classes  ·  425 élèves  ·  2 cycles  ·  9 activités  ·  7 classes enquêtées. "
+    "18 classes  ·  335 élèves  ·  2 cycles  ·  9 activités  ·  7 classes enquêtées. "
     "Document conçu pour être présenté, archivé, et transmis à d’autres écoles.", align="L")
 pdf.set_xy(LM, 86)
 pdf.set_font("D", "", 8)
@@ -209,7 +209,7 @@ somm = [
     ("4", "Cycle 3 : ce que font les CE2, CM1 et CM2", "5"),
     ("5", "Le questionnaire et ce que l’outil calcule", "6"),
     ("6", "Cadre réglementaire, données et droit à l’image", "7"),
-    ("7", "Organiser la journée dans une école de 17 classes", "8"),
+    ("7", "Organiser la journée dans une école de 18 classes", "8"),
     ("8", "Après la journée : saisir, consolider, rapporter", "9"),
     ("9", "Restitution et labellisation niveau 1", "10"),
     ("10", "Le prix Non au harcèlement", "11"),
@@ -265,8 +265,9 @@ pdf.set_xy(LM + 5, 242)
 pdf.set_font("D", "", 8.6)
 pdf.set_text_color(*INK)
 pdf.multi_cell(W - 10, 5.1,
-    "1.  Le 5 novembre, les 17 classes de l’école mènent une activité de lutte contre le harcèlement, "
-    "adaptée à leur âge ; les 7 classes de CE2 et de CM1-CM2 remplissent en plus la grille officielle.\n"
+    "1.  Le 5 novembre, les 18 classes de l’école mènent une activité de lutte contre le harcèlement, "
+    "adaptée à leur âge ; les 7 classes de CE2, de CM1 et de CM2 remplissent en plus la grille "
+    "officielle.\n"
     "2.  Les résultats sont saisis, calculés et interprétés selon la table de croisement du guide : "
     "l’école sait enfin combien d’élèves sont concernés, et lesquels recevoir.\n"
     "3.  Tout est gratuit, sans serveur, sans donnée en ligne, et transférable tel quel à une autre école.",
@@ -276,7 +277,7 @@ pdf.pied("Dossier de présentation · journée du 5 novembre 2026")
 # ============================== 2. NOTE DE SYNTHESE ==============================
 pdf.add_page()
 entete(pdf, "1 · Note de synthèse", "Ce que je soumets à votre examen",
-       "Objet : une journée de lutte contre le harcèlement outillée pour les 17 classes de l’école, "
+       "Objet : une journée de lutte contre le harcèlement outillée pour les 18 classes de l’école, "
        "du CP au CM2, dont l’exploitation des résultats est désormais interprétée.")
 
 h2(pdf, "Le problème que ce dispositif résout", 40)
@@ -342,10 +343,10 @@ pdf.rect(LM, y, 52, 20, style="F")
 pdf.set_xy(LM + 2, y + 2.5)
 pdf.set_font("D", "B", 9.4)
 pdf.set_text_color(255, 255, 255)
-pdf.multi_cell(48, 4.6, "17 classes\n425 élèves", align="C")
+pdf.multi_cell(48, 4.6, "18 classes\n335 élèves", align="C")
 # fleches et deux branches
 for i, (col, colc, titre, sous) in enumerate([
-        (VERT, VERT_C, "Cycle 2  ·  10 classes", "CP et CE1 : activités seules, 45 min"),
+        (VERT, VERT_C, "Cycle 2  ·  11 classes", "CP et CE1 : activités seules, 45 min"),
         (BLEU, BLEU_C, "Cycle 3  ·  7 classes", "CE2 à CM2 : activités puis questionnaire")]):
     yy = y - 4 + i * 26
     pdf.set_fill_color(*colc)
@@ -377,7 +378,7 @@ pdf.line(LM + 136, y + 32, LM + 142, y + 14)
 
 pdf.set_y(y + 50)
 h2(pdf, "Les six temps du dispositif")
-tps = [("1", "Préparer", "17 enveloppes, 20 minutes en conseil des maîtres, aucune formation.", "octobre"),
+tps = [("1", "Préparer", "18 enveloppes, 20 minutes en conseil des maîtres, aucune formation.", "octobre"),
        ("2", "Faire", "2 h banalisées : activités, puis questionnaire pour le cycle 3.", "5 nov. – 11 déc."),
        ("3", "Saisir", "Chaque professeur recopie sa classe : 30 minutes, au clavier.", "avant le 11 déc."),
        ("4", "Consolider", "7 fichiers fusionnés sur un poste ; effectifs ; rapport.", "décembre"),
@@ -422,7 +423,7 @@ pdf.pied("Dossier de présentation · le dispositif")
 # ============================== 4. CYCLE 2 ==============================
 pdf.add_page()
 entete(pdf, "3 · Cycle 2", "CP et CE1 : nommer, se protéger, dire à un adulte",
-       "Dix classes, environ 250 élèves. À cet âge, le mot « harcèlement » est trop abstrait : on travaille "
+       "Onze classes, environ 165 élèves. À cet âge, le mot « harcèlement » est trop abstrait : on travaille "
        "sur « ça fait mal », « tous les jours », « on le dit à un adulte ». Aucun questionnaire.", VERT)
 
 h2(pdf, "Les activités, par niveau", 40)
@@ -475,7 +476,7 @@ pdf.pied("Dossier de présentation · cycle 2")
 # ============================== 5. CYCLE 3 ==============================
 pdf.add_page()
 entete(pdf, "4 · Cycle 3", "CE2, CM1 et CM2 : comprendre, agir, argumenter",
-       "Sept classes, environ 175 élèves. Chaque classe mène deux ou trois activités, puis remplit la "
+       "Sept classes, environ 170 élèves. Chaque classe mène deux ou trois activités, puis remplit la "
        "grille officielle pendant trente minutes.", BLEU)
 
 h2(pdf, "Les activités, par niveau", 40)
@@ -661,8 +662,8 @@ pdf.pied("Dossier de présentation · cadre et conformité")
 
 # ============================== 8. ORGANISER ==============================
 pdf.add_page()
-entete(pdf, "7 · Mise en œuvre", "Organiser la journée dans une école de 17 classes",
-       "Six CP, quatre CE1, deux CE2, un CE2/CM1, deux CM1, un CM1/CM2, un CM2 : environ 425 élèves, dont "
+entete(pdf, "7 · Mise en œuvre", "Organiser la journée dans une école de 18 classes",
+       "Cinq CP, un CP/CE1, cinq CE1, deux CE2, un CE2/CM1, deux CM1, un CM1/CM2, un CM2 : environ 335 élèves, dont "
        "sept classes passent le questionnaire.")
 
 h2(pdf, "Qui fait quoi", 40)
@@ -672,8 +673,9 @@ for w, t, ce in [(24, "Niveau", 0), (12, "Nb", 1), (100, "Ce que fait la classe"
     cellule(pdf, x, y, w, 7, t, 7.4, True, ce, fill=IND_C)
     x += w
 y += 7
-lignes = [("CP", "6", "Ça fait mal ou pas ? + forêt de mains", "45 min"),
-          ("CE1", "4", "Les quatre images + les trois rôles + la comptine", "50 min"),
+lignes = [("CP", "5", "Ça fait mal ou pas ? + forêt de mains", "45 min"),
+          ("CP/CE1", "1", "Menu CP, puis les quatre images pour les CE1", "45 min"),
+          ("CE1", "5", "Les quatre images + les trois rôles + la comptine", "50 min"),
           ("CE2", "2", "Les 4 visages + feuille froissée + affiche", "45 min + 30"),
           ("CE2/CM1", "1", "Menu CE2, puis thermomètre pour les CM1", "45 min + 30"),
           ("CM1", "2", "Thermomètre + plan du témoin + mur des mots", "45 min + 30"),
@@ -687,25 +689,25 @@ for i, (a, b, c, d) in enumerate(lignes):
     y += 9
 
 h2(pdf, "Trois points de vigilance propres à une école de cette taille", y + 4)
-puce(pdf, "Les circulations", "dix-sept classes qui changent de salle en même temps, c’est le premier "
+puce(pdf, "Les circulations", "dix-huit classes qui changent de salle en même temps, c’est le premier "
      "risque de la journée. Un seul niveau circule à la fois, et les CP restent dans leur classe.")
 puce(pdf, "Les grands et les petits dans la même cour", "plus longtemps que d’habitude, ce jour-là. "
      "Renforcer la présence adulte aux récréations, sans l’annoncer.")
-puce(pdf, "Une seule parole publique", "à dix-sept classes, il y aura une ou deux confidences. Prévoir un "
+puce(pdf, "Une seule parole publique", "à dix-huit classes, il y aura une ou deux confidences. Prévoir un "
      "adulte disponible et un lieu pour écouter, sinon les élèves parleront dans le couloir.")
 
 h2(pdf, "Le rituel de 10 h — ce qui fait tenir l’école ensemble")
 for t in ["La même lecture courte dans toutes les classes, à la même heure. Cinq lignes, lues par le "
           "maître, jamais par un élève.",
-          "Chaque classe choisit trois mots et les écrit sur une bande. Les dix-sept bandes sont "
-          "accrochées ensemble dans le hall : le mur de l’école est fait de dix-sept classes.",
+          "Chaque classe choisit trois mots et les écrit sur une bande. Les dix-huit bandes sont "
+          "accrochées ensemble dans le hall : le mur de l’école est fait de dix-huit classes.",
           "Les CP et les CE1 récitent leur comptine pendant que les autres accrochent : c’est le seul "
           "moment où toute l’école regarde la même chose.",
           "Une photo à 10 h 30, un seul appareil, un seul adulte."]:
     puce(pdf, t)
 
 bloc(pdf, "Le rôle de la personne ressource, et ce qu’elle ne peut pas faire", [
-    "Avant : vingt minutes en conseil des maîtres, dix-sept enveloppes préparées, aucune formation.",
+    "Avant : vingt minutes en conseil des maîtres, dix-huit enveloppes préparées, aucune formation.",
     "Le jour même : elle circule, elle ne remplace personne, elle prend trois photos et récupère les "
     "traces.",
     "Après : elle rassemble les affiches et le mur, consolide les sept fichiers, et écrit les cinq lignes "
@@ -794,8 +796,8 @@ for w, t, ce in [(46, "Axe", 0), (86, "Ce que le dispositif apporte", 0), (54, "
     x += w
 y += 7
 axes = [
-    ("1 · S’engager", "Une action commune aux 17 classes, à une date unique", "Les photos et le mur du hall"),
-    ("2 · Prévenir", "Des séances par niveau, avant le questionnaire", "Les 17 affiches, les fiches élèves"),
+    ("1 · S’engager", "Une action commune aux 18 classes, à une date unique", "Les photos et le mur du hall"),
+    ("2 · Prévenir", "Des séances par niveau, avant le questionnaire", "Les 18 affiches, les fiches élèves"),
     ("3 · Former", "Un kit qui ne demande ni formation ni matériel", "Les fiches animateur, les enveloppes"),
     ("4 · Prendre en charge", "Une conduite à tenir écrite pour l’adulte", "La fiche adulte, la liste des élèves"),
 ]
@@ -811,7 +813,7 @@ bloc(pdf, "Ce que l’enquête apporte au dossier, et que rien d’autre ne remp
     "intention.",
     "Une mesure de départ, qui permet de recommencer l’an prochain et de comparer. Sans mesure initiale, "
     "aucune action de prévention ne peut être évaluée.",
-    "La preuve que les élèves ont été entendus : la grille remplie par 175 élèves est une pièce plus "
+    "La preuve que les élèves ont été entendus : la grille remplie par 170 élèves est une pièce plus "
     "solide qu’un compte rendu de réunion."],
     y + 3, fill=VERT_C, accent=VERT)
 pdf.pied("Dossier de présentation · restitution et labellisation")
@@ -847,7 +849,7 @@ for t in ["Le téléphone posé — les notifications arrivent, une main le reto
     puce(pdf, t)
 
 bloc(pdf, "Le levier : ne pas ajouter un projet, prolonger celui du 5 novembre", [
-    "Les dix-sept affiches de classe, le mur de mots et les photos existent déjà à la fin de la journée. "
+    "Les dix-huit affiches de classe, le mur de mots et les photos existent déjà à la fin de la journée. "
     "Photographiés et réunis, ils forment l’affiche collective de l’école : c’est la candidature, et elle "
     "ne coûte rien de plus.",
     "La vidéo, si l’école en fait une, filme la fabrication — les mains, les Post-it, le mur qui se "
@@ -919,7 +921,7 @@ for k, d in enumerate(droite):
 bloc(pdf, "Ce que cela coûte, et ce qui ne se transfère pas", [
     "Temps : vingt minutes de présentation en conseil des maîtres, deux heures par classe, trente minutes "
     "de saisie par classe. Environ quatre heures par enseignant sur la période.",
-    "Photocopies : environ 330 pages pour une école de 17 classes ; sous 150 avec les trois leviers "
+    "Photocopies : environ 340 pages pour une école de 18 classes ; sous 150 avec les trois leviers "
     "(thermomètre à deux, plan du témoin recopié, cartes CP remplacées par le pouce levé).",
     "Ce qui ne se transfère pas : les données. Aucune réponse d’élève ne circule avec les documents. Une "
     "école qui reprend le dispositif repart d’une base vide, et c’est voulu."],
@@ -992,7 +994,7 @@ y += 7
 docs = [
     ("mode-emploi-non-au-harcelement.pdf", "9", "Le protocole : passation papier, saisie, consolidation"),
     ("kit-journee-5-novembre.pdf", "17", "Le kit des activités, CE2 à CM2"),
-    ("kit-cycle-2.pdf", "6", "Le complément CP et CE1, plus l’organisation à 17 classes"),
+    ("kit-cycle-2.pdf", "6", "Le complément CP, CP/CE1 et CE1, plus l’organisation à 18 classes"),
     ("kit-journee-5-novembre-couleur.pdf", "19", "La version couleur, pour la présentation"),
     ("kit-journee-5-novembre-econome.pdf", "17", "La même chose, pour la photocopieuse"),
     ("enveloppes-journee-5-novembre.pdf", "9", "Les 17 fiches de pochette, à coller et distribuer"),
@@ -1011,7 +1013,7 @@ yb = bloc(pdf, "Comment archiver ce dossier", [
     "tablettes explique la plupart des difficultés." % VERSION,
     "Les fichiers exportés (.json) de l’année, un par classe, et le fichier consolidé.",
     "Les photos de la journée, les affiches scannées ou photographiées, et la fiche de suivi signée.",
-    "Les 17 grilles papier : ce sont les pièces de référence, elles ne sont pas remplacées par la saisie."],
+    "Les grilles papier des sept classes enquêtées : ce sont les pièces de référence, elles ne sont pas remplacées par la saisie."],
     y + 3, fill=(248, 249, 252))
 
 h2(pdf, "Contacts et suivi", yb + 5)
@@ -1054,7 +1056,7 @@ pdf.set_font("D", "", 7.6)
 pdf.set_text_color(*GREY)
 pdf.set_x(LM)
 pdf.multi_cell(W, 4.4, "Historique des versions de l’application : 20261027-7 (liste réelle des sept "
-                       "classes concernées, 17 classes au total, double niveau CE2/CM1) · 20261027-6 (saisie "
+                       "classes concernées, 18 classes au total, double niveau CE2/CM1) · 20261027-6 (saisie "
                        "au clavier, résultats par niveau) · 20261027-4 (sept classes pré-remplies) · "
                        "20261027-1 (première version).", align="L")
 pdf.pied("Dossier de présentation · inventaire")

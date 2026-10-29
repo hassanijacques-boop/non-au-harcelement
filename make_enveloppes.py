@@ -34,14 +34,15 @@ class PDF(FPDF):
 
 
 CLASSES = [
-    ("CP A", "CP", 1), ("CP B", "CP", 2), ("CP C", "CP", 3),
-    ("CP D", "CP", 4), ("CP E", "CP", 5), ("CP F", "CP", 6),
-    ("CE1 A", "CE1", 7), ("CE1 B", "CE1", 8), ("CE1 C", "CE1", 9), ("CE1 D", "CE1", 10),
-    ("CE2 A", "CE2", 11), ("CE2 B", "CE2", 12),
-    ("CE2/CM1", "CE2/CM1", 13),
-    ("CM1 A", "CM1", 14), ("CM1 B", "CM1", 15),
-    ("CM1/CM2", "CM2", 16),
-    ("CM2", "CM2", 17),
+    ("CP A", "CP", 1), ("CP B", "CP", 2), ("CP C", "CP", 3), ("CP D", "CP", 4), ("CP E", "CP", 5),
+    ("CP/CE1", "CP/CE1", 6),
+    ("CE1 A", "CE1", 7), ("CE1 B", "CE1", 8), ("CE1 C", "CE1", 9),
+    ("CE1 D", "CE1", 10), ("CE1 E", "CE1", 11),
+    ("CE2 A", "CE2", 12), ("CE2 B", "CE2", 13),
+    ("CE2/CM1", "CE2/CM1", 14),
+    ("CM1 A", "CM1", 15), ("CM1 B", "CM1", 16),
+    ("CM1/CM2", "CM2", 17),
+    ("CM2", "CM2", 18),
 ]
 
 DETAIL = {
@@ -54,6 +55,19 @@ DETAIL = {
         ],
         "commun": "À ajouter : le papier pour la forêt de mains, et les noms des adultes à qui on parle.",
         "duree": "45 minutes d’activités. Pas de questionnaire pour les CP.",
+        "ordre": "Le cadre (5 min)  ·  pouce en l’air / pouce en bas (15 min)  ·  les trois mots (10 min)  ·  "
+                 "la forêt de mains (10 min)  ·  à qui on le dit (5 min).",
+    },
+    "CP/CE1": {
+        "imprimer": "pages 1 et 2 du complément CP-CE1",
+        "doc": "kit-cycle-2.pdf",
+        "dedans": [
+            "1 fiche animateur avec les 8 scènes à lire (p. 1)",
+            "les cartes « ça va / ça ne va pas » (p. 2) — 1 page pour 6 élèves",
+        ],
+        "commun": "Double niveau : on prend le menu CP, que les CE1 suivent sans difficulté. Les CE1 "
+                  "enchaînent sur « les quatre images » (p. 4) s’ils en ont besoin.",
+        "duree": "45 minutes d’activités. Pas de questionnaire pour les CP et les CE1.",
         "ordre": "Le cadre (5 min)  ·  pouce en l’air / pouce en bas (15 min)  ·  les trois mots (10 min)  ·  "
                  "la forêt de mains (10 min)  ·  à qui on le dit (5 min).",
     },

@@ -280,7 +280,7 @@ def couverture(pdf):
     pdf.cell(0, 8, "Kit pédagogique de lutte contre le harcèlement")
     pdf.set_xy(LM, 49)
     pdf.set_font("D", "", 10.4)
-    pdf.cell(0, 6, "Du CP au CM2  ·  dix-sept classes  ·  dix-neuf pages  ·  cinq niveaux")
+    pdf.cell(0, 6, "Du CP au CM2  ·  dix-huit classes  ·  dix-neuf pages  ·  cinq niveaux")
     pdf.set_fill_color(255, 255, 255)
     pdf.rect(LM, 61, 44, 0.9, style="F")
     pdf.set_xy(LM, 66)
@@ -367,8 +367,8 @@ def note_cpc(pdf):
 
     h2(pdf, "Ce dont il s’agit", 40)
     para(pdf, "Un kit d’activités pour la journée nationale de lutte contre le harcèlement, conçu pour "
-              "dix-sept classes d’école élémentaire (six CP, quatre CE1, deux CE2, un CE2-CM1, deux CM1, "
-              "un CM1-CM2, un CM2), dont sept passent le questionnaire. Il ne remplace "
+              "dix-huit classes d’école élémentaire (cinq CP, un CP-CE1, cinq CE1, deux CE2, un CE2-CM1, "
+              "deux CM1, un CM1-CM2, un CM2), dont sept passent le questionnaire. Il ne remplace "
               "pas la passation de la grille officielle : il la prépare. Le guide de passation demande en "
               "effet d’expliquer aux élèves ce que sont le harcèlement et ses conséquences avant de leur "
               "remettre le questionnaire. Ces activités sont cette explication — organisée, écrite, et "
@@ -462,7 +462,7 @@ if ECO:
     pdf.cell(0, 5, "Journée nationale de lutte contre le harcèlement · CE2, CM1, CM2 · école élémentaire")
     pdf.set_xy(LM, 23.6)
     pdf.set_font("D", "", 8.4)
-    pdf.cell(0, 5, "Dix-sept classes · cinq niveaux · supports à découper · fiches animateur")
+    pdf.cell(0, 5, "Dix-huit classes · cinq niveaux · supports à découper · fiches animateur")
     pdf.set_draw_color(*INK)
     pdf.set_line_width(1.1)
     pdf.line(LM, 31, 210 - LM, 31)
@@ -479,7 +479,7 @@ else:
     pdf.cell(0, 5, "Journée nationale de lutte contre le harcèlement · CE2, CM1, CM2 · école élémentaire")
     pdf.set_xy(LM, 23.6)
     pdf.set_font("D", "", 8.4)
-    pdf.cell(0, 5, "Dix-sept classes · cinq niveaux · supports à découper · fiches animateur")
+    pdf.cell(0, 5, "Dix-huit classes · cinq niveaux · supports à découper · fiches animateur")
     pdf.set_y(40)
 
 h2(pdf, "Comment fonctionne ce kit")
@@ -532,7 +532,7 @@ for r in ["On ne fait jamais témoigner un élève sur sa propre situation, mêm
     puce(pdf, r)
 
 bloc(pdf, "Ce que fait la personne ressource, en dehors de sa classe", [
-    "Avant : 20 minutes de présentation en conseil des maîtres, et dix-sept enveloppes préparées.",
+    "Avant : 20 minutes de présentation en conseil des maîtres, et dix-huit enveloppes préparées.",
     "Le jour même : elle circule, elle ne remplace personne, elle prend trois photos et elle récupère "
     "les traces produites.",
     "Après : elle rassemble les affiches et le mur, et écrit les cinq lignes du bilan pour le rapport "
