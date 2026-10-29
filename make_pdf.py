@@ -221,7 +221,7 @@ def fiche_suivi(pdf):
         pdf.set_xy(x + w, y)
     pdf.ln(8.6)
 
-    classes = ["CE2 A", "CE2 B", "CM1 A", "CM1 B", "CM1 C", "CM2", "CM1/CM2", "", "", ""]
+    classes = ["CE2 A", "CE2 B", "CE2/CM1", "CM1 A", "CM1 B", "CM1/CM2", "CM2", "", "", ""]
     hb = 13.0
     for cl in classes:
         pdf.set_x(LM)
