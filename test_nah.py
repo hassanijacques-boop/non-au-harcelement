@@ -291,7 +291,19 @@ with sync_playwright() as pw:
     verif("Questionnaire de la 4e tablette ajouté", p.evaluate("() => DB.rep.length") == 32,
           p.evaluate("() => DB.rep.length"))
 
-    # ---------- 7. MOBILE ----------
+    # ---------- 10 bis. LISTE DES CLASSES : reprise et reparation ----------
+    p.evaluate("() => { DB.cfg.classesTxt = 'CE2 A ; 25\\nCM1 C ; 27\\nCM2 ; 26'; sauver(); }")
+    p.reload(); p.wait_for_timeout(900)
+    lst = p.evaluate("() => classes().map(c => c.n).join('|')")
+    verif("Tablette portant « CM1 C » → liste réelle rétablie",
+          lst == "CE2 A|CE2 B|CE2/CM1|CM1 A|CM1 B|CM1/CM2|CM2", lst)
+
+    p.evaluate("() => { DB.cfg.classesTxt = 'CE2 A ; 25'; window.confirm = () => true; listeEcole(); }")
+    lst2 = p.evaluate("() => classes().map(c => c.n).join('|')")
+    verif("Bouton « Rétablir la liste » → les 7 classes",
+          lst2 == "CE2 A|CE2 B|CE2/CM1|CM1 A|CM1 B|CM1/CM2|CM2", lst2)
+
+    # ---------- 11. MOBILE ----------
     ctx2 = br.new_context(viewport={"width": 390, "height": 844}, locale="fr-FR",
                           user_agent="Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 Chrome/120 Mobile Safari/537.36")
     p2 = ctx2.new_page()

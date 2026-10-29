@@ -3,7 +3,7 @@
    Grille officielle 2025 (CE2-CM2) — passation sur tablette + interprétation
    Tout est local : aucune donnée ne quitte l’appareil.
    ========================================================================= */
-var VERSION = '20261027-7';
+var VERSION = '20261027-8';
 
 /* ------------------------------- DONNÉES -------------------------------- */
 /* d : total auquel la question appartient (A, B, C) — null = non comptée.
@@ -168,6 +168,11 @@ function charger() {
       if (o && o.rep && o.rep.length !== undefined) DB.rep = o.rep;
       for (var m = 0; m < ANCIENS.length; m++) {
         if (DB.cfg.classesTxt === ANCIENS[m]) DB.cfg.classesTxt = CLASSES_DEFAUT;
+      }
+      /* « CM1 C » n’existe pas dans l’école : toute tablette qui la porte
+         reçoit la liste réelle, quels que soient les effectifs saisis. */
+      if (DB.cfg.classesTxt.indexOf('CM1 C') >= 0 && DB.cfg.classesTxt.indexOf('CE2/CM1') < 0) {
+        DB.cfg.classesTxt = CLASSES_DEFAUT;
       }
     }
   } catch (e) {}
@@ -1548,6 +1553,7 @@ function tabConfig() {
   t += '<p class="small muted">Une classe par ligne, au format <b>Nom ; effectif</b>. Les effectifs servent au taux de participation.</p>';
   t += '<textarea id="ccls" rows="6" style="width:100%;padding:13px;border:2px solid #dde3ee;border-radius:12px;font-family:inherit;font-size:1rem;line-height:1.7">' + esc(DB.cfg.classesTxt) + '</textarea>';
   t += '<p class="tiny muted">Exemple : <b>CM1/CM2 B ; 27</b></p>';
+  t += '<button class="btn mini" style="margin-top:10px" onclick="listeEcole()">Rétablir la liste des 7 classes de l\u2019école</button>';
   t += '<p class="tiny muted" style="margin-top:6px">Cette liste doit être la même sur toutes les tablettes, sinon les élèves ne choisiront pas la même classe. Elle est déjà pré-remplie pour les 7 classes concernées par le questionnaire (CE2 A, CE2 B, CE2/CM1, CM1 A, CM1 B, CM1/CM2, CM2).</p></div>';
 
   t += '<div class="card"><h2>Code d’accès adulte</h2>';
@@ -1557,6 +1563,18 @@ function tabConfig() {
   t += '<button class="btn" onclick="saveCfg()">Enregistrer les réglages</button>';
   t += '<p class="tiny muted" style="text-align:center;margin-top:14px">Version ' + VERSION + ' · ' + DB.rep.length + ' questionnaire(s) en mémoire</p>';
   return t;
+}
+
+/* Remet la liste officielle des 7 classes concernées par le questionnaire.
+   Utile sur une tablette qui aurait gardé une ancienne liste. */
+function listeEcole() {
+  if (!confirm('Remplacer la liste actuelle par les 7 classes de l\u2019école ?\n\n' +
+               'CE2 A · CE2 B · CE2/CM1 · CM1 A · CM1 B · CM1/CM2 · CM2\n\n' +
+               'Les effectifs repasseront à 0 : ils sont à ressaisir.')) return;
+  DB.cfg.classesTxt = CLASSES_DEFAUT;
+  sauver();
+  dessiner();
+  toast('Liste des 7 classes rétablie');
 }
 
 function saveCfg() {

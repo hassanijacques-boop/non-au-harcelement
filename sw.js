@@ -1,4 +1,4 @@
-var CACHE = 'nah-v7-20261027';
+var CACHE = 'nah-v8-20261027';
 var FICHIERS = [
   './',
   './index.html',
