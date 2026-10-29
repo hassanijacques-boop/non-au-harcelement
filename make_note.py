@@ -7,7 +7,7 @@ FONT = "/home/hermeswebui/.fonts/DejaVuSans.ttf"
 FONTB = "/home/hermeswebui/.fonts/DejaVuSans-Bold.ttf"
 SH = "/workspace/nah"
 URL = "https://hassanijacques-boop.github.io/non-au-harcelement/"
-VERSION = "20261027-8"
+VERSION = "20261027-9"
 
 IND = (67, 56, 202)
 IND_L = (238, 242, 255)

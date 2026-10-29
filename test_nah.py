@@ -195,6 +195,23 @@ with sync_playwright() as pw:
         p.click(".pinpad button:text-is('%s')" % c)
     p.wait_for_timeout(500)
 
+    # l'onglet Reglages doit etre visible (il sortait de l'ecran sur tablette)
+    rg = p.evaluate("""() => {
+      const b = [...document.querySelectorAll('.tab')].find(x => x.textContent.trim() === 'Réglages');
+      const btn = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Réglages');
+      if (!b) return {tab: false};
+      const r = b.getBoundingClientRect();
+      return {tab: true, droite: Math.round(r.right), largeur: innerWidth, haut: r.height, entete: !!btn};
+    }""")
+    verif("Onglet Réglages présent et dans l’écran", rg.get("tab") and rg["droite"] <= rg["largeur"], rg)
+    verif("Bouton Réglages dans l’en-tête", rg.get("entete"), rg)
+    p.click(".tab:text-is('Réglages')")
+    p.wait_for_timeout(350)
+    tcfg = p.inner_text("#app")
+    verif("Réglages : liste des classes + bouton de rétablissement", "Rétablir la liste" in tcfg, tcfg[:90])
+    p.click(".tab:text-is('Vue d’ensemble')")
+    p.wait_for_timeout(300)
+
     a = p.evaluate("() => { const a = analyse(); return {n:a.n, harc:a.harc, surv:a.surv, rien:a.rien, tH:a.tauxH, tS:a.tauxS, eff:a.effectif, part:a.part, graves:a.graves, alertes:a.alertes.length, app:a.appareils, niv:a.parNiveau}; }")
     verif("31 questionnaires analysés", a["n"] == 31, a)
     verif("4 harcèlement", a["harc"] == 4, a["harc"])

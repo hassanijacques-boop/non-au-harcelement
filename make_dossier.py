@@ -7,7 +7,7 @@ FONT = "/home/hermeswebui/.fonts/DejaVuSans.ttf"
 FONTB = "/home/hermeswebui/.fonts/DejaVuSans-Bold.ttf"
 SH = "/workspace/nah"
 URL = "hassanijacques-boop.github.io/non-au-harcelement"
-VERSION = "20261027-8"
+VERSION = "20261027-9"
 
 INK = (18, 22, 32)
 GREY = (92, 98, 110)
@@ -1055,7 +1055,8 @@ pdf.set_y(258)
 pdf.set_font("D", "", 7.6)
 pdf.set_text_color(*GREY)
 pdf.set_x(LM)
-pdf.multi_cell(W, 4.4, "Historique des versions de l’application : 20261027-8 (bouton de rétablissement de "
+pdf.multi_cell(W, 4.4, "Historique des versions de l’application : 20261027-9 (onglet Réglages toujours accessible, "
+                       "onglets sur plusieurs lignes) · 20261027-8 (bouton de rétablissement de "
                        "la liste des classes) · 20261027-7 (liste réelle des sept "
                        "classes concernées, 18 classes au total, double niveau CE2/CM1) · 20261027-6 (saisie "
                        "au clavier, résultats par niveau) · 20261027-4 (sept classes pré-remplies) · "

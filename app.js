@@ -3,7 +3,7 @@
    Grille officielle 2025 (CE2-CM2) — passation sur tablette + interprétation
    Tout est local : aucune donnée ne quitte l’appareil.
    ========================================================================= */
-var VERSION = '20261027-8';
+var VERSION = '20261027-9';
 
 /* ------------------------------- DONNÉES -------------------------------- */
 /* d : total auquel la question appartient (A, B, C) — null = non comptée.
@@ -1144,8 +1144,10 @@ function vAdulte() {
   var t = '<div class="wrap"><div class="noprint" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
   t += '<div><div style="font-weight:900;font-size:1.05rem">Espace adulte</div>';
   t += '<div class="tiny muted">' + esc(DB.cfg.nom || '') + '</div></div>';
+  t += '<div style="display:flex;gap:7px">';
+  t += '<button class="btn mini" onclick="onglet(\'config\')">Réglages</button>';
   t += '<button class="btn mini gris" onclick="aller(\'accueil\')">Quitter</button>';
-  t += '</div>';
+  t += '</div></div>';
 
   var tabs = [['vue', 'Vue d’ensemble'], ['classes', 'Par classe'], ['questions', 'Par question'],
               ['eleves', 'Élèves à recevoir'], ['rapport', 'Rapport'], ['donnees', 'Données'], ['config', 'Réglages']];
