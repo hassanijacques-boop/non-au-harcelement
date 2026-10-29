@@ -997,8 +997,9 @@ docs = [
     ("kit-cycle-2.pdf", "6", "Le complément CP, CP/CE1 et CE1, plus l’organisation à 18 classes"),
     ("kit-journee-5-novembre-couleur.pdf", "19", "La version couleur, pour la présentation"),
     ("kit-journee-5-novembre-econome.pdf", "17", "La même chose, pour la photocopieuse"),
-    ("enveloppes-journee-5-novembre.pdf", "9", "Les 17 fiches de pochette, à coller et distribuer"),
+    ("enveloppes-journee-5-novembre.pdf", "9", "Les 18 fiches de pochette, à coller et distribuer"),
     ("note-aux-professeurs.pdf", "1", "La note à distribuer aux collègues"),
+    ("fiche-fusion.pdf", "1", "Le mode d’emploi de la fusion, à garder près du PC"),
     ("dossier-presentation.pdf", "14", "Ce document"),
 ]
 for i, (a, b, c) in enumerate(docs):
