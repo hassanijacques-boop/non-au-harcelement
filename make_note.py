@@ -111,7 +111,7 @@ pdf.set_font("D", "", 9.5)
 pdf.cell(0, 5, "Enquête « Non au harcèlement » · grille d’auto-évaluation · année scolaire 2026-2027")
 pdf.set_xy(LM, 20.8)
 pdf.set_font("D", "", 8.3)
-pdf.cell(0, 5, "École primaire publique La Rose · circonscription IEN Bandraboua · CE2, CM1, CM2")
+pdf.cell(0, 5, "École primaire publique La Rose · circonscription IEN Bandraboua · du CP au CM2")
 
 # ------------------------------- INTRO -------------------------------
 y = para(pdf,
@@ -122,6 +122,10 @@ y = para(pdf,
          "qui change, c’est la suite — vos résultats sont saisis dans une application qui calcule les "
          "indices officiels et rédige l’interprétation. Plus de dépouillement à la main, et des résultats "
          "lisibles pour chaque classe.", y + 1.2, color=IND)
+y = para(pdf,
+         "Les CP et les CE1 participent à la journée avec des activités adaptées à leur âge, mais ne "
+         "remplissent pas le questionnaire : le complément CP-CE1 est sur le lien, pages 1 à 5.",
+         y + 1.4, color=GREY, size=8.8)
 
 # échéance
 pdf.set_y(y + 2.4)

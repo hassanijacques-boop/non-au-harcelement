@@ -34,18 +34,42 @@ class PDF(FPDF):
 
 
 CLASSES = [
-    ("CE2 A", "CE2", 1),
-    ("CE2 B", "CE2", 2),
-    ("CM1 A", "CM1", 3),
-    ("CM1 B", "CM1", 4),
-    ("CM1 C", "CM1", 5),
-    ("CM2", "CM2", 6),
-    ("CM1/CM2", "CM2", 7),
+    ("CP A", "CP", 1), ("CP B", "CP", 2), ("CP C", "CP", 3), ("CP D", "CP", 4),
+    ("CE1 A", "CE1", 5), ("CE1 B", "CE1", 6), ("CE1 C", "CE1", 7), ("CE1 D", "CE1", 8),
+    ("CE2 A", "CE2", 9), ("CE2 B", "CE2", 10),
+    ("CM1 A", "CM1", 11), ("CM1 B", "CM1", 12), ("CM1 C", "CM1", 13),
+    ("CM2", "CM2", 14), ("CM1/CM2", "CM2", 15),
 ]
 
 DETAIL = {
+    "CP": {
+        "imprimer": "pages 1 et 2 du complément CP-CE1",
+        "doc": "kit-cycle-2.pdf",
+        "dedans": [
+            "1 fiche animateur avec les 8 scènes à lire (p. 1)",
+            "les cartes « ça va / ça ne va pas » (p. 2) — 1 page pour 6 élèves",
+        ],
+        "commun": "À ajouter : le papier pour la forêt de mains, et les noms des adultes à qui on parle.",
+        "duree": "45 minutes d’activités. Pas de questionnaire pour les CP.",
+        "ordre": "Le cadre (5 min)  ·  pouce en l’air / pouce en bas (15 min)  ·  les trois mots (10 min)  ·  "
+                 "la forêt de mains (10 min)  ·  à qui on le dit (5 min).",
+    },
+    "CE1": {
+        "imprimer": "pages 3 à 5 du complément CP-CE1",
+        "doc": "kit-cycle-2.pdf",
+        "dedans": [
+            "1 fiche animateur avec les 8 situations (p. 3)",
+            "les 4 images du tri à afficher (p. 4)",
+            "les 3 cartes-rôles à découper et la comptine (p. 5)",
+        ],
+        "commun": "À ajouter : des gommettes ou des bouts de papier pour voter sous les images.",
+        "duree": "50 minutes d’activités. Pas de questionnaire pour les CE1.",
+        "ordre": "Le cadre (5 min)  ·  le tri (15 min)  ·  les trois rôles (10 min)  ·  la scène à rejouer "
+                 "(15 min)  ·  la comptine (5 min).",
+    },
     "CE2": {
         "imprimer": "pages 2 à 5  +  page 15",
+        "doc": "kit-journee-5-novembre.pdf",
         "dedans": [
             "1 fiche animateur (p. 2)",
             "16 cartes « situations » (p. 3 et 4) — prévoir 3 jeux, soit 6 pages",
@@ -60,6 +84,7 @@ DETAIL = {
     },
     "CM1": {
         "imprimer": "pages 6 à 8  +  page 15",
+        "doc": "kit-journee-5-novembre.pdf",
         "dedans": [
             "1 fiche animateur (p. 6)",
             "fiches élève « thermomètre » (p. 7) — une pour deux élèves",
@@ -74,6 +99,7 @@ DETAIL = {
     },
     "CM2": {
         "imprimer": "pages 9 à 12  +  page 15",
+        "doc": "kit-journee-5-novembre.pdf",
         "dedans": [
             "1 fiche animateur débat mouvant (p. 9)",
             "8 affirmations à découper + les 2 affiches D’ACCORD / PAS D’ACCORD (p. 10)",
@@ -100,7 +126,7 @@ def carte(pdf, x, y, w, h, nom, niveau, num):
     pdf.set_xy(x + 5, y + 4)
     pdf.set_font("D", "", 7.2)
     pdf.set_text_color(*GREY)
-    pdf.cell(60, 4, "ENVELOPPE %d sur 7" % num)
+    pdf.cell(60, 4, "ENVELOPPE %d sur %d" % (num, len(CLASSES)))
     pdf.set_xy(x + 5, y + 8)
     pdf.set_font("D", "B", 17)
     pdf.set_text_color(*INK)
@@ -127,7 +153,7 @@ def carte(pdf, x, y, w, h, nom, niveau, num):
     pdf.set_xy(x + 5, y + 26.4)
     pdf.set_font("D", "", 7.4)
     pdf.set_text_color(*GREY)
-    pdf.cell(0, 4.2, "À télécharger ici :  hassanijacques-boop.github.io/non-au-harcelement/kit-journee-5-novembre.pdf")
+    pdf.cell(0, 4.2, "À télécharger ici :  hassanijacques-boop.github.io/non-au-harcelement/" + d["doc"])
     pdf.set_text_color(*INK)
 
     # ce qu'il y a dedans
