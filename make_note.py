@@ -115,17 +115,14 @@ pdf.cell(0, 5, "École primaire publique La Rose · circonscription IEN Bandrabo
 
 # ------------------------------- INTRO -------------------------------
 y = para(pdf,
-         "À l’occasion de la journée nationale de lutte contre le harcèlement, tous les élèves du CE2 au CM2 "
-         "remplissent la grille d’auto-évaluation officielle, pendant les deux heures banalisées.", 37)
+         "Le 5 novembre, toute l’école participe à la journée nationale de lutte contre le harcèlement : les "
+         "élèves du CE2 au CM2 remplissent la grille officielle, les CP et les CE1 mènent des activités "
+         "adaptées, sans questionnaire.", 36)
 y = para(pdf,
-         "La passation se fait sur papier, comme les années précédentes : rien ne change dans la classe. Ce "
-         "qui change, c’est la suite — vos résultats sont saisis dans une application qui calcule les "
-         "indices officiels et rédige l’interprétation. Plus de dépouillement à la main, et des résultats "
-         "lisibles pour chaque classe.", y + 1.2, color=IND)
-y = para(pdf,
-         "Les CP et les CE1 participent à la journée avec des activités adaptées à leur âge, mais ne "
-         "remplissent pas le questionnaire : le complément CP-CE1 est sur le lien, pages 1 à 5.",
-         y + 1.4, color=GREY, size=8.8)
+         "La passation ne change pas : la grille reste remplie sur papier. Ce qui change, c’est la suite — vos "
+         "résultats sont saisis dans l’application, qui calcule les indices officiels et rédige "
+         "l’interprétation. Plus de dépouillement à la main, des résultats lisibles par classe.",
+         y + 1.2, color=IND)
 
 # échéance
 pdf.set_y(y + 2.4)
@@ -147,13 +144,17 @@ y = etape(pdf, 1, "Faire passer la grille en classe", [
     "les copies."], y + 16.5)
 
 y = etape(pdf, 2, "Saisir les résultats de votre classe — 30 minutes", [
-    "Ouvrir le lien ci-dessous, puis « Saisir les réponses (enseignant) ». Choisir sa classe une seule "
-    "fois : elle est mémorisée. Un élève par écran ; les touches 1 à 4 remplissent chaque ligne, Entrée "
-    "enregistre et passe à l’élève suivant."], y)
+    "Ouvrir le lien ci-dessous, puis « Saisir les réponses (enseignant) ». Votre classe est déjà dans la "
+    "liste : choisissez-la une seule fois, elle est mémorisée. Un élève par écran ; les touches 1 à 4 "
+    "remplissent chaque ligne, Entrée enregistre et passe à l’élève suivant.",
+    "Avant de commencer, vérifier en bas de l’écran d’accueil : Version " + VERSION + ". Sur une version "
+    "plus ancienne, la liste des classes est fausse : fermer l’application et la rouvrir."], y)
 
 y = etape(pdf, 3, "Exporter votre fichier et le transmettre", [
-    "Espace adulte → code 2026 → onglet Données → « Sauvegarde complète (.json) ». Renommer le fichier "
-    "avec votre classe (CM1-B.json) et le transmettre à la direction."], y)
+    "Espace adulte → code 2026 → onglet Données → « Sauvegarde complète (.json) ». Renommer le fichier au "
+    "nom de votre classe (CM1-B.json) et le transmettre à la direction.",
+    "Si vous partagez la tablette avec un collègue, exportez avant de la lui passer : sinon vos réponses "
+    "partent dans son fichier."], y)
 
 # ------------------------------- LIEN + QR -------------------------------
 ybox = y + 1.5
@@ -186,30 +187,28 @@ pdf.set_text_color(*GREY)
 pdf.multi_cell(38, 3.0, "à scanner", align="C")
 
 # --------------------------- POINTS DE VIGILANCE ---------------------------
-y = encadre(pdf, "Trois points de vigilance",
-            ["Les grilles papier restent la pièce de référence : conservez-les, elles ne sont pas remplacées "
-             "par la saisie.",
-             "N’attendez pas la fin de la période pour saisir : une classe oubliée fausse les résultats de "
-             "toute l’école, et rien ne le signalerait.",
-             "Ne videz pas l’historique de Chrome sur le poste où vous avez saisi : cela effacerait vos "
-             "réponses avant l’export."],
-            ybox + 36, (254, 242, 242), (254, 202, 202), ROUGE)
+y = encadre(pdf, "Quatre points de vigilance",
+            ["Conservez les grilles papier : c’est la pièce de référence, la saisie ne les remplace pas.",
+             "N’attendez pas la fin de la période : une classe oubliée fausse les résultats de l’école.",
+             "Ne videz pas l’historique de Chrome : cela effacerait vos réponses avant l’export.",
+             "Liste incorrecte ? Espace adulte → Réglages → « Rétablir la liste des 7 classes »."],
+            ybox + 35, (254, 242, 242), (254, 202, 202), ROUGE)
 
 # ------------------------------ CE QUE VOUS RECEVEZ ------------------------------
 y = encadre(pdf, "Ce que vous recevez en retour",
             ["Les résultats de votre classe, élève par élève, avec la liste des élèves à recevoir et les "
              "faits déclarés — de quoi préparer vos entretiens.",
-             "Les résultats de l’école par niveau et les thèmes de prévention qui ressortent : ils serviront "
-             "de base aux séances de l’année."],
-            y + 4, (240, 253, 244), (187, 247, 208), VERT)
+             "Les résultats de l’école par niveau et les thèmes qui ressortent : ce n’est pas une évaluation "
+             "de votre travail, ni un classement des classes, mais le point de départ des séances de l’année."],
+            y + 3.5, (240, 253, 244), (187, 247, 208), VERT)
 
 # -------------------------------- CONTACT --------------------------------
-pdf.set_y(y + 5)
+pdf.set_y(y + 4.5)
 pdf.set_font("D", "", 8.7)
 pdf.set_text_color(*INK)
 pdf.set_x(LM)
 pdf.cell(0, 5, "Une question, un problème de connexion, une situation à signaler ?")
-pdf.set_y(y + 10)
+pdf.set_y(y + 9.5)
 pdf.set_x(LM)
 pdf.cell(0, 5, "Contact : .....................................................................        "
                "Le protocole complet est sur le lien, page « Aide ».")
