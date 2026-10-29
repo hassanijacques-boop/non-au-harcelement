@@ -7,7 +7,7 @@ FONT = "/home/hermeswebui/.fonts/DejaVuSans.ttf"
 FONTB = "/home/hermeswebui/.fonts/DejaVuSans-Bold.ttf"
 SH = "/workspace/nah"
 URL = "https://hassanijacques-boop.github.io/non-au-harcelement/"
-VERSION = "20261027-6"
+VERSION = "20261027-7"
 
 IND = (67, 56, 202)
 IND_L = (238, 242, 255)
@@ -403,7 +403,9 @@ encadre(pdf, "Point de vigilance pour la circonscription",
 # ====================== PAGE 3 — AVANT LA CAMPAGNE ======================
 pdf.add_page()
 h1(pdf, "Avant la campagne : organiser", 18)
-para(pdf, "Le cas visé : une école de 7 classes (2 CE2, 3 CM1, 1 CM2, 1 CM1-CM2). Chaque enseignant "
+para(pdf, "Le cas visé : sur les 17 classes de l’école, 7 passent le questionnaire (2 CE2, 1 CE2-CM1, "
+          "2 CM1, 1 CM1-CM2, 1 CM2). Les 10 classes de CP et de CE1 ont des activités adaptées le même jour, "
+          "décrites dans le complément CP-CE1 : elles ne remplissent pas la grille. Chaque enseignant "
           "saisit sa propre classe, sur son propre poste.")
 
 h2(pdf, "1. Imprimer les grilles", avant=2)
@@ -426,7 +428,7 @@ puce(pdf, "Ouvrir le lien, puis « Ajouter à l’écran d’accueil »", "l’a
 puce(pdf, "Vérifier la version", "en bas de l’écran d’accueil doit apparaître « " + VERSION + " ». Si un "
      "autre numéro s’affiche, fermer complètement l’application et la rouvrir ; au besoin, supprimer "
      "l’icône et la recréer depuis le lien.")
-puce(pdf, "Rien à configurer", "les sept classes de l’école sont déjà pré-remplies dans l’application. "
+puce(pdf, "Rien à configurer", "les sept classes concernées sont déjà pré-remplies dans l’application. "
      "Aucune liste à saisir, sur aucun poste.", color=VERT)
 
 h2(pdf, "4. Ce que représente le temps de saisie")

@@ -34,11 +34,14 @@ class PDF(FPDF):
 
 
 CLASSES = [
-    ("CP A", "CP", 1), ("CP B", "CP", 2), ("CP C", "CP", 3), ("CP D", "CP", 4),
-    ("CE1 A", "CE1", 5), ("CE1 B", "CE1", 6), ("CE1 C", "CE1", 7), ("CE1 D", "CE1", 8),
-    ("CE2 A", "CE2", 9), ("CE2 B", "CE2", 10),
-    ("CM1 A", "CM1", 11), ("CM1 B", "CM1", 12), ("CM1 C", "CM1", 13),
-    ("CM2", "CM2", 14), ("CM1/CM2", "CM2", 15),
+    ("CP A", "CP", 1), ("CP B", "CP", 2), ("CP C", "CP", 3),
+    ("CP D", "CP", 4), ("CP E", "CP", 5), ("CP F", "CP", 6),
+    ("CE1 A", "CE1", 7), ("CE1 B", "CE1", 8), ("CE1 C", "CE1", 9), ("CE1 D", "CE1", 10),
+    ("CE2 A", "CE2", 11), ("CE2 B", "CE2", 12),
+    ("CE2/CM1", "CE2/CM1", 13),
+    ("CM1 A", "CM1", 14), ("CM1 B", "CM1", 15),
+    ("CM1/CM2", "CM2", 16),
+    ("CM2", "CM2", 17),
 ]
 
 DETAIL = {
@@ -78,6 +81,22 @@ DETAIL = {
             "1 fiche adulte : pièges et contacts (p. 17) — à garder, ne pas afficher",
         ],
         "commun": "À ajouter : bandelettes du mur des alliés (p. 14), mur des mots, boîte et quiz 3018 (p. 16).",
+        "duree": "45 minutes d’activités, puis 30 minutes de questionnaire.",
+        "ordre": "Rituel commun (10 min)  ·  les 4 visages (25 min)  ·  la feuille froissée (10 min)  ·  "
+                 "le questionnaire papier (30 min)  ·  l’affiche (25 min)  ·  clôture (10 min).",
+    },
+    "CE2/CM1": {
+        "imprimer": "pages 2 à 5  +  page 15",
+        "doc": "kit-journee-5-novembre.pdf",
+        "dedans": [
+            "1 fiche animateur (p. 2)",
+            "16 cartes « situations » (p. 3 et 4) — prévoir 3 jeux, soit 6 pages",
+            "4 en-têtes de familles (p. 5)",
+            "1 affiche de classe à compléter (p. 15)",
+            "1 fiche adulte : pièges et contacts (p. 17) — à garder, ne pas afficher",
+        ],
+        "commun": "Double niveau : on prend le menu CE2, accessible aux deux. Les CM1 enchaînent sur le "
+                  "thermomètre (p. 7) s’ils en ont besoin.",
         "duree": "45 minutes d’activités, puis 30 minutes de questionnaire.",
         "ordre": "Rituel commun (10 min)  ·  les 4 visages (25 min)  ·  la feuille froissée (10 min)  ·  "
                  "le questionnaire papier (30 min)  ·  l’affiche (25 min)  ·  clôture (10 min).",

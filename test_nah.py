@@ -208,8 +208,8 @@ with sync_playwright() as pw:
     verif("Total par niveau = total école", sum(x["tot"] for x in a["niv"]) == a["n"], a["niv"])
     nv = p.evaluate("() => [niveauDe('CM1/CM2 B'), niveauDe('CM2'), niveauDe('CM1 C'), niveauDe('CP'), niveauDe('CE2 B')]")
     verif("Niveau déduit du nom de classe", nv == ["CM1/CM2", "CM2", "CM1", "Autre", "CE2"], nv)
-    nv7 = p.evaluate("() => ['CE2 A','CE2 B','CM1 A','CM1 B','CM1 C','CM2','CM1/CM2'].map(niveauDe)")
-    verif("7 classes de l’école → niveaux corrects", nv7 == ["CE2","CE2","CM1","CM1","CM1","CM2","CM1/CM2"], nv7)
+    nv7 = p.evaluate("() => ['CE2 A','CE2 B','CE2/CM1','CM1 A','CM1 B','CM1/CM2','CM2'].map(niveauDe)")
+    verif("les 7 classes concernées → niveaux corrects", nv7 == ["CE2","CE2","CE2/CM1","CM1","CM1","CM1/CM2","CM2"], nv7)
     p.screenshot(path=SH + "/07-vue-ensemble.png", full_page=True)
 
     txt = p.inner_text("#app")

@@ -402,9 +402,9 @@ pdf.pied("Kit du 5 novembre · CE1 · cartes-rôles et comptine")
 
 # ================ 6. ORGANISATION A 15 CLASSES ================
 pdf.add_page()
-entete(pdf, "Personne ressource", "Organiser la journée à quinze classes",
-       "Quatre CP, quatre CE1, deux CE2, trois CM1, un CM2, un CM1/CM2 : environ 375 élèves. "
-       "Ce qui change par rapport à un dispositif à sept classes.")
+entete(pdf, "Personne ressource", "Organiser la journée à dix-sept classes",
+       "Six CP, quatre CE1, deux CE2, un CE2/CM1, deux CM1, un CM1/CM2, un CM2 : environ 425 élèves, "
+       "dont sept classes seulement passent le questionnaire.")
 
 h2(pdf, "Qui fait quoi", 40)
 pdf.set_draw_color(*LINE)
@@ -415,12 +415,13 @@ pdf.cell(14, 7, "Nb", border=1, fill=True, align="C")
 pdf.cell(72, 7, "Ce que fait la classe", border=1, fill=True)
 pdf.cell(0, 7, "Durée", border=1, fill=True)
 pdf.set_y(pdf.get_y() + 7)
-lignes = [("CP", "4", "Ça fait mal ou pas ? + forêt de mains", "45 min"),
+lignes = [("CP", "6", "Ça fait mal ou pas ? + forêt de mains", "45 min"),
           ("CE1", "4", "Les quatre images + les trois rôles + la comptine", "50 min"),
           ("CE2", "2", "Les 4 visages + feuille froissée + affiche", "45 min"),
-          ("CM1", "3", "Thermomètre + plan du témoin + mur des mots", "45 min"),
-          ("CM2", "1", "Débat mouvant + théâtre-forum + ambassadeurs", "50 min"),
+          ("CE2/CM1", "1", "Menu CE2, puis thermomètre pour les CM1", "45 min"),
+          ("CM1", "2", "Thermomètre + plan du témoin + mur des mots", "45 min"),
           ("CM1/CM2", "1", "Menu CM2", "50 min"),
+          ("CM2", "1", "Débat mouvant + théâtre-forum + ambassadeurs", "50 min"),
           ("CE2 à CM2", "7", "Puis le questionnaire officiel, sur papier", "30 min")]
 for a, b, c, d in lignes:
     yy = pdf.get_y()
@@ -433,23 +434,23 @@ for a, b, c, d in lignes:
     pdf.cell(0, 7, d, border=1, align="C")
     pdf.set_y(yy + 7)
 
-h2(pdf, "Les trois points de vigilance d’une journée à quinze classes")
+h2(pdf, "Les trois points de vigilance d’une journée à dix-sept classes")
 puce(pdf, "Le bruit et les circulations.",
-     "Quinze classes qui changent de salle en même temps, dans des couloirs étroits, c’est le premier "
+     "Dix-sept classes qui changent de salle en même temps, dans des couloirs étroits, c’est le premier "
      "risque de la journée. Faire circuler un seul niveau à la fois, et garder les CP dans leur classe.")
 puce(pdf, "Les grands et les petits dans la même cour.",
      "Une journée où toute l’école parle de harcèlement est aussi une journée où les grands croisent les "
      "petits plus longtemps que d’habitude. Renforcer la présence adulte aux récréations ce jour-là, sans "
      "en faire une annonce.")
 puce(pdf, "Une seule parole publique.",
-     "À quinze classes, il y aura forcément une ou deux confidences. Prévoir un adulte disponible et un "
+     "À dix-sept classes, il y aura forcément une ou deux confidences. Prévoir un adulte disponible et un "
      "lieu pour écouter, sinon les élèves parleront dans le couloir.")
 
-h2(pdf, "Le rituel de 10 h — ce qui fait tenir les quinze classes ensemble")
+h2(pdf, "Le rituel de 10 h — ce qui fait tenir les dix-sept classes ensemble")
 for t in ["La même lecture courte dans toutes les classes, à la même heure : cinq lignes, lues par le "
           "maître, pas par un élève.",
-          "Chaque classe choisit trois mots et les écrit sur une bande de papier. Les quinze bandes sont "
-          "accrochées ensemble dans le hall : c’est le mur de l’école, et il est fait de quinze classes.",
+          "Chaque classe choisit trois mots et les écrit sur une bande de papier. Les dix-sept bandes sont "
+          "accrochées ensemble dans le hall : c’est le mur de l’école, et il est fait de dix-sept classes.",
           "Les CP et CE1 récitent leur comptine pendant que les autres accrochent : c’est le seul moment "
           "où toute l’école regarde la même chose au même moment.",
           "Une photo à 10 h 30, un seul appareil, un seul adulte. Une photo par niveau suffit pour la "
@@ -457,13 +458,13 @@ for t in ["La même lecture courte dans toutes les classes, à la même heure : 
     puce(pdf, t)
 
 bloc(pdf, "Ce que tu ne peux pas faire seule", [
-    "À quinze classes, la personne ressource ne peut pas animer. Elle prépare les quinze enveloppes, "
+    "À dix-sept classes, la personne ressource ne peut pas animer. Elle prépare les dix-sept enveloppes, "
     "présente vingt minutes en conseil des maîtres, et circule le jour J.",
     "Ce qui décide de la réussite, ce n’est pas la qualité de l’activité : c’est que chaque professeur "
     "ait, sur son bureau, une fiche qui tient debout toute seule. C’est le seul objectif du kit."],
     pdf.get_y() + 3, fill=(248, 249, 252))
 
-pdf.pied("Kit du 5 novembre · organisation à quinze classes")
+pdf.pied("Kit du 5 novembre · organisation à dix-sept classes")
 
 out = "/workspace/nah/kit-cycle-2.pdf"
 pdf.output(out)
